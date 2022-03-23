@@ -34,21 +34,22 @@ for im_ind=range_do
          Lc = load([segdir D{im_ind}],'Lc');
          L= Lc(im_ind).('Lc');
 
-         %kill small objects
-         props=regionprops(L,'Perimeter','Area');
-         val=[props.Perimeter]./[props.Area]; %calculates ratio between surface area and the area of the segmented object
-         f=find(val<0.30);
-         %f=find(val<0.25);
-         L=ismember(L,f);
-         L = bwlabel(L,4);
+% Commented out killing schmutz. It was killing small cells 2022.03.23
+%          %kill small objects
+%          props=regionprops(L,'Perimeter','Area');
+%          val=[props.Perimeter]./[props.Area]; %calculates ratio between surface area and the area of the segmented object
+%          f=find(val<0.30);
+%          %f=find(val<0.25);
+%          L=ismember(L,f);
+%          L = bwlabel(L,4);
+% 
+%          %killing small cells
+%          r = regionprops(L,'Area');
+%          flittle = find([r.Area]>50);
+%          bw2 = ismember(L, flittle);
+%          L2 = bwlabel(bw2,4);
 
-         %killing small cells
-         r = regionprops(L,'Area');
-         flittle = find([r.Area]>50);
-         bw2 = ismember(L, flittle);
-         L2 = bwlabel(bw2,4);
-
-         Lc= L2;
+         Lc= L;
          im_s=size(Lc);
          Lc_m=zeros([im_s,mat_zero_size]);
          Lc_m(:,:,im_ind)=Lc;
@@ -71,20 +72,22 @@ for im_ind=range_do
         Lc = load([segdir D{im_ind}],'Lc'); 
 
         L= Lc(1).('Lc');
+        L2=L;
 
-         %kill small objects
-         props=regionprops(L,'Perimeter','Area');
-         val=[props.Perimeter]./[props.Area]; %calculates ratio between surface area and the area of the segmented object
-         f=find(val<0.30);
-         %f=find(val<0.25);
-         L=ismember(L,f);
-         L = bwlabel(L,4);
-
-         %killing small cells
-         r = regionprops(L,'Area');
-         flittle = find([r.Area]>50);
-         bw2 = ismember(L, flittle);
-         L2 = bwlabel(bw2,4);
+% Commented out killing schmutz. It was killing small cells 2022.03.23
+%          %kill small objects
+%          props=regionprops(L,'Perimeter','Area');
+%          val=[props.Perimeter]./[props.Area]; %calculates ratio between surface area and the area of the segmented object
+%          f=find(val<0.30);
+%          %f=find(val<0.25);
+%          L=ismember(L,f);
+%          L = bwlabel(L,4);
+% 
+%          %killing small cells
+%          r = regionprops(L,'Area');
+%          flittle = find([r.Area]>50);
+%          bw2 = ismember(L, flittle);
+%          L2 = bwlabel(bw2,4);
 
         Lc_m(:,:,im_ind) = L2;
         %Add to y stack

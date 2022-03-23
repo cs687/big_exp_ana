@@ -16,10 +16,11 @@ function track_core_2019_06_13_v8m(p,Lc_m,yreg_m,rreg_m,channels,c,colors,poslis
 %posctr: index of position
 
 %Cropping out channels from stack
-Lc_c=Lc_m(:,channels(c)-20:channels(c)+20,:);
-yreg_c=yreg_m(:,channels(c)-20:channels(c)+20,:);
-rreg_c=rreg_m(:,channels(c)-20:channels(c)+20,:);
-%preg_c=preg_m(:,channels(c)-20:channels(c)+20,:);
+padding=35;
+Lc_c=Lc_m(:,channels(c)-padding:channels(c)+padding,:);
+yreg_c=yreg_m(:,channels(c)-padding:channels(c)+padding,:);
+rreg_c=rreg_m(:,channels(c)-padding:channels(c)+padding,:);
+%preg_c=preg_m(:,channels(c)-padding:channels(c)+padding,:);
 
 s = struct('frames',[],'P',[],'D',[],'E',[],'ind_c',[],'len',[],'wid',[],'MC',[],'MY',[],'MR',[],'cellno',[],'channel_pos',[],'Lc_c',[],'yreg',[],'rreg',[]);
 s.Lc_c=Lc_c;

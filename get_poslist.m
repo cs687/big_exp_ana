@@ -4,11 +4,13 @@ function poslist=get_poslist(p)
 
 imgdir=p.imageDir;
 date1= p.movieDate;
-%Finding basename
-basenamedir = dir([imgdir filesep '*-*-y-001.tif']);
-basenamesetpoints = strfind(basenamedir(1).name,'-');
-basename = basenamedir(1).name(1:basenamesetpoints(1)-1);  
-clear basenamedir basenamesetpoints;
+
+%commented out. It does not seem to be needed 2022.03.23
+% %Finding basename
+% basenamedir = dir([imgdir filesep '*-*-y-001.tif']);
+% basenamesetpoints = strfind(basenamedir(1).name,'-');
+% basename = basenamedir(1).name(1:basenamesetpoints(1)-1);  
+% clear basenamedir basenamesetpoints;
 
 D_pos=dir([imgdir,date1,'\Bacillus-*']);
 poslist_pre = {D_pos.name};
