@@ -1,4 +1,4 @@
-function [Lc_out,rreg_out,yreg_out]=shift_x_2022_02_10_v1_speedy(Lc_m,rreg_m,yreg_m,channels,do_now);
+function [Lc_out,rreg_out,yreg_out,preg_out]=shift_x_2022_02_10_v1_speedy(Lc_m,rreg_m,yreg_m,preg_m,channels,do_now,do_phase);
 
 f=find(channels(:,1)==0);
 
@@ -20,6 +20,9 @@ Lc_out=zeros(size(Lc_m,1),size(Lc_m,2)+100);
 %preg_out=zeros(size(Lc_m,1),size(Lc_m,2)+100,time_points);
 yreg_out=zeros(size(Lc_m,1),size(Lc_m,2)+100);
 rreg_out=zeros(size(Lc_m,1),size(Lc_m,2)+100);
+if do_phase==1
+    preg_out=zeros(size(Lc_m,1),size(Lc_m,2)+100);
+end
 
 size_x=size(Lc_m,2);
 
@@ -31,6 +34,9 @@ i=f2(end);
        % preg_out(:,50:50+size_x-1,1)=preg_m(:,:,1);
         yreg_out(:,50:50+size_x-1)=yreg_m;
         rreg_out(:,50:50+size_x-1)=rreg_m;
+        if do_phase==1
+            preg_out(:,50:50+size_x-1)=preg_m;
+        end
     else
         for z=1:f(end)-1
             cand=nan(f(end)-1,1);
@@ -46,6 +52,9 @@ i=f2(end);
        Lc_out(:,50-shift(i-1):50+size_x-shift(i-1)-1)=Lc_m;
         rreg_out(:,50-shift(i-1):50+size_x-shift(i-1)-1)=rreg_m;
         yreg_out(:,50-shift(i-1):50+size_x-shift(i-1)-1)=yreg_m;
+        if do_phase==1
+            preg_out(:,50-shift(i-1):50+size_x-shift(i-1)-1)=preg_m;
+        end
     end
 % end
 

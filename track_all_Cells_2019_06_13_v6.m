@@ -15,9 +15,9 @@ function p=track_all_Cells_2019_06_13_v6(p,range)
 colors='ry';
 poslist=get_poslist(p);
 imgDir=p.imageDir;
+poslist(7)=[];
 
 %Loop over all positions
-for posctr=1:length(poslist)
-    p = initschnitz(poslist{posctr},p.movieDate,'bacillus','rootDir',imgDir,'imageDir',imgDir);
-    run_track_all_cells_2019_06_13_v4(p,poslist,posctr,colors,range);
+parfor posctr=1:length(poslist)
+    run_track_all_cells_2019_06_13_v5(p,poslist,posctr,colors,range);
 end

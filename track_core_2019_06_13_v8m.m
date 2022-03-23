@@ -29,6 +29,23 @@ s.rreg=rreg_c;
 %Tracking all frames
 for segctr = 1:size(Lc_c,3)
     Lc=Lc_c(:,:,segctr);
+    %cleaning edges
+    for i=1:max2(Lc); 
+         %first edge
+         a=Lc(:,1); 
+         f=find(a(a==i));
+         if ~isempty(f); 
+            Lc(Lc==i)=0;
+         end
+
+         %second edge
+         a=Lc(:,end); 
+         f=find(a(a==i));
+         if ~isempty(f); 
+            Lc(Lc==i)=0;
+         end
+     end
+    
     r = regionprops(Lc,'MajorAxisLength','MinorAxisLength','Centroid');
 
     % Get and sort y pos

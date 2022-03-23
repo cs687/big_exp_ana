@@ -14,8 +14,8 @@ function run_track_all_cells_2019_06_13_v4(p,poslist,posctr,colors,range)
 
 if exist('Lc_m')
     %load channel positions
-    if exist([p.imageDir,'channel_pos_',poslist{posctr}(10:11),'.txt'])
-        channels=dlmread([p.imageDir,'channel_pos_',poslist{posctr}(10:11),'.txt']);
+    if exist([p.movieDir,p.movieName,'_channels.txt'])
+        channels=dlmread([p.movieDir,p.movieName,'_channels.txt']);
         %Loop over all channels of one stage position
         for c=1:length(channels)
             disp(c);
