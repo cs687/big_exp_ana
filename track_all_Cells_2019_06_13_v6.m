@@ -18,6 +18,8 @@ imgDir=p.imageDir;
 poslist(7)=[];
 
 %Loop over all positions
+parpool(3);
 parfor posctr=1:length(poslist)
+%for posctr=1:length(poslist)
     run_track_all_cells_2019_06_13_v5(p,poslist,posctr,colors,range);
 end

@@ -91,10 +91,12 @@ L4=bwlabel(L3,4);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Killing Schmutz by Area
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-props2=regionprops(L4,'Area','Perimeter');
-f3=find([props2.Area]>200&1500>[props2.Area]&[props2.Perimeter]./[props2.Area]<0.25);
-L5=bwlabel(ismember(L4,f3),4);
-L=L5;
+%Commented out 2022.03.23 Kills too much schmutz.
+% props2=regionprops(L4,'Area','Perimeter');
+% f3=find([props2.Area]>200&1500>[props2.Area]&[props2.Perimeter]./[props2.Area]<0.25);
+% L5=bwlabel(ismember(L4,f3),4);
+% L=L5;
+L=L4;
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Final Checks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

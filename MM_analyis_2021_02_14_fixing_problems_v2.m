@@ -95,7 +95,7 @@ cd([path,'\','subAuto']);
 D=dir('*p-001.tif');
 if ismember(2,todo);
     parfor i=1:length(D)
-        p = initschnitz(D(i).name(1:11),'2016-06-14','bacillus','rootDir',cd,'imageDir',cd);
+        p = initschnitz(D(i).name(1:11),'2022-03-23','bacillus','rootDir',cd,'imageDir',cd);
         p = segmoviefluor_mm_para_2021_05_25_v2(p);
     end
 end
@@ -103,7 +103,7 @@ end
 %Correction shift
 p = initschnitz(D(i).name(1:11),'2016-06-14','bacillus','rootDir',cd,'imageDir',cd);
 if correct_shift==1
-    correcting_shift_2022_02_11_v3_speedy(p);
+    correcting_shift_2022_02_11_v3_speedy(p,1);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%

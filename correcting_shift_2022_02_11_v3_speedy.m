@@ -1,7 +1,9 @@
 function correcting_shift_2022_02_10_v2_speedy(p);
 %colors='ry';
+do_phase=1;
 savelist='''phsub'',''LNsub'',''Lc'',''tempsegcorrect'',''rect'',''timestamp'',''phaseFullSize'',''yreg'',''yshift'',''yback'',''ybinning'',''rreg'',''rshift'',''rback'',''rbinning''';
 poslist=get_poslist(p);
+poslist=poslist([1:6,8:end]);
 D_all=dir([p.segmentationDir,'Bacillus-01-p-*']);
 parfor pos_now=1:length(poslist);
 %parfor pos_now=1:33;
@@ -17,7 +19,7 @@ parfor pos_now=1:length(poslist);
 %        [Lc_m,rreg_m,yreg_m]=load_images_into_memory_preg_shift_2022_02_10_v1_speedy(p,p_out,poslist,pos_now,1:length(D_all));
        %load_images_into_memory_preg_shift_2022_02_10_v1_speedy(p,p_out,poslist,pos_now,1:length(D_all));
        %load_images_into_memory_preg_shift_2022_02_10_v1_speedy(p,pos_now,poslist,pos_now,1:length(D_all));
-       load_images_into_memory_preg_shift_2022_02_11_v2_speedy(p,pos_now,poslist,pos_now,1:length(D_all));
+       load_images_into_memory_preg_shift_2022_02_11_v2_speedy(p,pos_now,poslist,pos_now,1:length(D_all),do_phase);
         %Shifting images
 %         if exist('Lc_m')
 %                 channels=zeros(100,size(Lc_m,3));

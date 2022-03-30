@@ -67,7 +67,12 @@ D = {D.name};
 %             save([p_out.segmentationDir,D{im_ind}],'Lc','yreg','rreg');
         end
             channels=finding_channels_2022_02_10_v1(channels,Lc_m,im_ind);
-            [Lc,rreg,yreg,preg]=shift_x_2022_02_10_v1_speedy(Lc_m,rreg_m,yreg_m,preg_m,channels,im_ind,do_phase);
+            if do_phase==1
+                [Lc,rreg,yreg,preg]=shift_x_2022_02_10_v1_speedy(Lc_m,rreg_m,yreg_m,preg_m,channels,im_ind,do_phase);
+            else
+                [Lc,rreg,yreg]=shift_x_2022_02_10_v1_speedy(Lc_m,rreg_m,yreg_m,preg_m,channels,im_ind,do_phase);
+            end 
+            
             if do_phase==1
                 save([p_out.segmentationDir,D{im_ind}],'Lc','yreg','rreg','preg');
             else

@@ -1,4 +1,4 @@
-function [Lc_out,rreg_out,yreg_out,preg_out]=shift_x_2022_02_10_v1_speedy(Lc_m,rreg_m,yreg_m,preg_m,channels,do_now,do_phase);
+function [Lc_out,rreg_out,yreg_out,varargout]=shift_x_2022_02_10_v1_speedy(Lc_m,rreg_m,yreg_m,preg_m,channels,do_now,do_phase);
 
 f=find(channels(:,1)==0);
 
@@ -56,6 +56,9 @@ i=f2(end);
             preg_out(:,50-shift(i-1):50+size_x-shift(i-1)-1)=preg_m;
         end
     end
+if do_phase==1
+    varargout{1}=preg_out;
+end
 % end
 
         

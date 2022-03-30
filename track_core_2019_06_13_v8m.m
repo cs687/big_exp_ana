@@ -119,7 +119,9 @@ for segctr = 1:size(Lc_c,3)
                 sch_num=open_s(ind_old(cell_ind_t_old));
                 division_detected = 0;
                 if sch_age >= 1 
-                    if r(cell_m).MajorAxisLength < .75*s(sch_num).len(sch_age) %if it has divided                
+                    if r(cell_m).MajorAxisLength < .75*s(sch_num).len(sch_age)
+                        division_detected = 1;
+                    elseif r(cell_m).MajorAxisLength +10< s(sch_num).len(sch_age)%if it has divided                
                         division_detected = 1;
                         %cell_ind_t=cell_ind_t+1;
                     end
