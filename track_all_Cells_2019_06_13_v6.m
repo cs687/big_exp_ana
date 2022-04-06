@@ -15,7 +15,7 @@ function p=track_all_Cells_2019_06_13_v6(p,range)
 colors='ry';
 poslist=get_poslist(p);
 imgDir=p.imageDir;
-poslist(7)=[];
+%poslist(7)=[];
 
 %Loop over all positions
 parpool(3);

@@ -61,7 +61,7 @@ L = bwlabel(f);
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%
 props=regionprops(L,'Perimeter','Area');
 val=[props.Perimeter]./[props.Area]; %calculates ratio between surface area and the area of the segmented object
-f=find(val<0.25);
+f=find(val<0.3); %0.3
 L=ismember(L,f);
 L = bwlabel(L,4);
 
@@ -96,7 +96,18 @@ L4=bwlabel(L3,4);
 % f3=find([props2.Area]>200&1500>[props2.Area]&[props2.Perimeter]./[props2.Area]<0.25);
 % L5=bwlabel(ismember(L4,f3),4);
 % L=L5;
-L=L4;
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%
+%killing small cells
+%%%%%%%%%%%%%%%%%%%%%%%%
+r = regionprops(L4,'Area');
+flittle = find([r.Area]>50);
+bw2 = ismember(L4, flittle);
+L5 = bwlabel(bw2,4);
+L=L5;
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Final Checks
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
