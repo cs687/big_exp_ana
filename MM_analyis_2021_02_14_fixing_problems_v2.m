@@ -140,7 +140,7 @@ if ismember(2,todo);
 end
 
 %Correction shift
-p = initschnitz(D(i).name(1:11),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+p = initschnitz(D(1).name(1:11),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
 if correct_shift==1
     correcting_shift_2022_02_11_v3_speedy(p,date_out,do);
 end
