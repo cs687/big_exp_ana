@@ -72,7 +72,7 @@ for j=1:length(file_names)
             Len_at_start_cell(kk,j)=a(i).len(1);
             MY_at_start_cell(kk,j)=a(i).MY(1);
             frame_start_cell(kk,j)=a(i).frames(1);
-            frame_mid_cell_cycle(kk,j)=a(i).frames(nearest(length(a(i).frames)/2));
+            frame_mid_cell_cycle(kk,j)=a(i).frames(round(length(a(i).frames)/2));
             cell_cycle(kk,j)=length(a(i).frames);
             if i==1
                     for w=1:length(a(i).frames)-1;

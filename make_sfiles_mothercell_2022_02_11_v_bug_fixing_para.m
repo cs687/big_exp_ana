@@ -10,13 +10,18 @@ function make_sfiles_mothercell_2022_02_11_v_bug_fixing_para(p,varargin)
 % datedir= 'C:\Users\Chris\Desktop\test_mm\2\2\subAuto\2016-06-14';
 %getting varagin
 good_pos=0;
+do.frames=nan;
+do.pos=nan;
+
 if length(varargin)>0
     for i=1:2:length(varargin)
         theparam = lower(varargin{i});
         switch(strtok(theparam)),
             case 'poslist',
                 good_pos=1;
-                poslist=varagin{i+1};
+                poslist=varargin{i+1};
+            case 'do'
+                do=varargin{i+1};
         end;
     end;
 end;
@@ -53,7 +58,8 @@ end
 
 %%
 %Find datefolder name
-D = dir([imgdir filesep '202*-*-*']); D = D(vertcat(D.isdir));
+D = dir([imgdir filesep p.movieDate,'*']); 
+D = D(vertcat(D.isdir));
 if length(D) ~= 1
     error('Either a date directory was not found in the sub folder, or there was more than 1 identified date folder');
 end
@@ -68,8 +74,15 @@ clear D;
 % end
 
 %% now running through movies and tracking the top cell from each mask
-for posctr = 1:length(poslist)
-%for posctr = 1:1
+%Checking which position to do
+if isnan(do.pos)==1
+    do_pos_now=1:length(poslist);
+else
+    do_pos_now=do.pos;
+end
+
+
+for posctr = do_pos_now;
     disp(poslist(posctr));
       p = initschnitz(poslist{posctr},...
         datestr,...
@@ -78,11 +91,19 @@ for posctr = 1:length(poslist)
         'imageDir',imgdir); 
     segdir = p.segmentationDir;
     
-    D = dir([segdir '*.mat']); D = {D.name};
+    D = dir([segdir '*.mat']); 
+    D = {D.name};
+   
+
     
-    try
+    %try
     if length(D)>10;
-        for im_ind=1:length(D)
+        if isnan(do.frames(end))~=1&&length(D)>=do.frames(end)
+            do_frames_now=1:do.frames(end);
+        else
+           do_frames_now=1:length(poslist);
+        end
+        for im_ind=do_frames_now
             if im_ind==1
                  Lc = load([segdir D{im_ind}],'Lc');
                  Lc= Lc(im_ind).('Lc');
@@ -340,9 +361,9 @@ for posctr = 1:length(poslist)
         %clear segctr D ctr segdir p s;
     end
     
-    catch
-        disp(['Problem ',D{im_ind}]);
-    end
+%     catch
+%         disp(['Problem ',D{im_ind}]);
+%     end
 end
 mkdir(imgdir,'Data');
 all_s=whos('s_Bacillus*');

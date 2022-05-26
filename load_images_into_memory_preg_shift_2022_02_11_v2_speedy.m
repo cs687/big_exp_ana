@@ -1,9 +1,9 @@
-function [Lc_m,rreg_m,yreg_m]=load_images_into_memory_preg_shift_2022_02_11_v2_speedy(p,pos_now,poslist,posctr,range,do_phase)
+function [Lc_m,rreg_m,yreg_m]=load_images_into_memory_preg_shift_2022_02_11_v2_speedy(p,pos_now,poslist,posctr,range,do_phase,date_in,date_out)
 % posctr=pos_now;
 % range=1:800;
 %Script to load all images into memory 
-p_out = initschnitz(poslist{pos_now},'2022-04-52','bacillus','rootDir',p.imageDir,'imageDir',p.imageDir);
-p = initschnitz(poslist{pos_now},'2022-04-05','bacillus','rootDir',p.imageDir,'imageDir',p.imageDir);
+p_out = initschnitz(poslist{pos_now},date_out,'bacillus','rootDir',p.imageDir,'imageDir',p.imageDir);
+p = initschnitz(poslist{pos_now},date_in,'bacillus','rootDir',p.imageDir,'imageDir',p.imageDir);
 
 
 disp(poslist(posctr));

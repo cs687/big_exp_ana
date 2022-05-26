@@ -1,4 +1,4 @@
-function Crop_Frames_func_1_2021_11_22_v1(pos_do_now,dbs,cropBuff,image_folder,crop_folder, frames, w1, w2, out_name,chanwidth )
+function Crop_Frames_func_1_2021_11_22_v1(pos_do_now,dbs,cropBuff,image_folder,crop_folder, frames, w1, w2, out_name,chanwidth,in_path )
 %This is the core functiont to prepare the images for segmentation. It
 %rotates, crops, renames and save the images. It also detects the location
 %of channels with cells.
@@ -104,7 +104,7 @@ disp(['Analysing Position: ',num2str(pos_do_now)]);
 % cd(image_folder);
 
 %6. Cropping, roatating, renaming and saving images.
-D=dir(['*_s',num2str(pos_do_now),'_t1.*']);
+D=dir([in_path,'*_s',num2str(pos_do_now),'_t1.*']);
 for j=1:length(D)
     ind_base_name=strfind(D(j).name,'t1.');
     base_name_loop=D(j).name(1:ind_base_name);
@@ -137,18 +137,18 @@ for j=1:length(D)
             end
         end
 
-        newname = [out_name,'-',str2(str2num(stagepos)),'-',newchannel,'-',str3(ind),'.tif'];
+        newname = [out_name,'-',str2(str2num(stagepos)),'-',newchannel,'-',str3(k),'.tif'];
         disp(newname);
         %Rotate and crop
 %         if rot_im==1
 %             im_rename=imrotate(imread(pos_name),180);
 %             im_rename=im_rename(chan1-cropBuff:chan2+cropBuff,:);
 %         else
-            im_rename=imread(pos_name);
+            im_rename=imread([in_path,pos_name]);
 %         end
         disp(num2str(j));
         %Saving Image
-        imwrite(im_rename,[image_folder,'\subAuto\',newname]);
+        imwrite(im_rename,[in_path,'\subAuto\',newname]);
         ind=ind+1;
     end
 end

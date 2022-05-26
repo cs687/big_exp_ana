@@ -42,6 +42,10 @@ todo=nan;
 seg=nan;
 do_plot=nan;
 correct_shift=nan;
+do.pos=nan;
+do.frames=nan;
+do.para_seg=nan;
+do.para_shift=nan;
 if length(varargin)>0
     for i = 1:2:length(varargin),
         theparam = lower(varargin{i});
@@ -54,7 +58,15 @@ if length(varargin)>0
                 do_plot=varargin{i+1};
             case 'shift'
                 correct_shift=varargin{i+1};
-        end;
+            case 'do_pos'
+                do.pos=varargin{i+1};
+            case 'do_frames'
+                do.frames=varargin{i+1};
+            case 'do_para_seg'
+                do.para_seg=varargin{i+1};
+            case 'do_para_shift'
+                do.para_shift=varargin{i+1}; 
+        end
     end
 end
 
@@ -70,20 +82,30 @@ end
 if isnan(correct_shift)
     correct_shift=0;
 end
+if isnan(do.para_seg)
+    do.para_seg=1;
+end
+if isnan(do.para_shift)
+    do.para_shift=1;
+end
 
+if in_path(end)~='\'
+    in_path=[in_path,'\'];
+end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 0. Set parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-date1='2016-06-14';
-path=in_path;
-cd(in_path);
+date_in='2022-03-23';
+date_out='2022-04-52';
+%path=in_path;
+%cd(in_path);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 1. Pre-Analysis 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ismember(1,todo);
     %Finding_channels_and_rotate_2021_10_08_v3
-    Finding_channels_and_rotate_2021_11_22_v3
+    Finding_channels_and_rotate_2021_11_22_v3(in_path,do)
 %     Finding_channels_and_rotate_2021_11_06_v3
     %Finding_channels_and_rotate_2021_10_08_v3('PosList',50:56);
 end
@@ -91,42 +113,59 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 2. Segmentation 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-cd([path,'\','subAuto']);
-D=dir('*p-001.tif');
+%cd([path,'\','subAuto']);
+in_path=[in_path,'subAuto\'];
+D=dir([in_path,'*p-001.tif']);
+if isnan(do.pos)
+    pos_do_now=1:length(D);
+else
+    pos_do_now=do.pos;
+end
+
+
 if ismember(2,todo);
-    parfor i=1:length(D)
-        p = initschnitz(D(i).name(1:11),'2022-03-23','bacillus','rootDir',cd,'imageDir',cd);
-        p = segmoviefluor_mm_para_2021_05_25_v2(p);
+    %checking if doing parallel segmentation
+    if do.para_seg==1
+        parfor i=pos_do_now
+            p = initschnitz(D(i).name(1:11),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+            p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
+        end
+    else
+        for i=pos_do_now
+            p = initschnitz(D(i).name(1:11),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+            p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
+        end
     end
+        
 end
 
 %Correction shift
-p = initschnitz(D(i).name(1:11),'2016-06-14','bacillus','rootDir',cd,'imageDir',cd);
+p = initschnitz(D(i).name(1:11),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
 if correct_shift==1
-    correcting_shift_2022_02_11_v3_speedy(p,1);
+    correcting_shift_2022_02_11_v3_speedy(p,date_out,do);
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 3. Tracking
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 what_plot='AYlen';
-if exist([p.rootDir,'2021-11-03'])
-    p = initschnitz('Bacillus-01','2021-11-03','bacillus','rootDir',cd,'imageDir',cd);
-else
-    p = initschnitz('Bacillus-01','2016-06-14','bacillus','rootDir',cd,'imageDir',cd);
-end
+% if exist([p.rootDir,'2021-11-03'])
+    p = initschnitz('Bacillus-01',date_out,'bacillus','rootDir',in_path,'imageDir',in_path);
+% else
+%     p = initschnitz('Bacillus-01','2016-06-14','bacillus','rootDir',cd,'imageDir',cd);
+% end
 
 p.dataDir=[p.rootDir,'Data\'];
 if ismember(3,todo);
     if ~exist(p.dataDir)
         mkdir(p.dataDir);
     end
-    D=dir('Bacillus-01-p-*');
+    D=dir([p.rootDir,'Bacillus-01-p-*']);
     range=length(D);
     if ismember(seg,1)
         p=track_all_Cells_2019_06_13_v6(p,range);
     elseif ismember(seg,2);
-        make_sfiles_mothercell_2022_02_11_v_bug_fixing_para(p)
+        make_sfiles_mothercell_2022_02_11_v_bug_fixing_para(p,'do',do)
         ind=calc_promo_21_11_01_BMM2(p);
         plotting_MM_data_2021_11_01_v3(p,what_plot)
     end   

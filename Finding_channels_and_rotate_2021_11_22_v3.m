@@ -1,4 +1,4 @@
-function Finding_channels_and_rotate_2021_10_08_v3(varargin)
+function Finding_channels_and_rotate_2021_10_08_v3(in_path,do,varargin)
 %1. This function automatically rotates the image to have the mother on the
 % top of the channel. 
 %2. It then crops the images to only contain the channels with cells in side. 
@@ -26,13 +26,17 @@ out_name='Bacillus';
 chanwidth=24;
 
 %Making output folder
-image_folder=cd;
-mkdir('subAuto');
+image_folder=in_path;
+
+if ~exist([in_path,'subAuto'])
+   mkdir([in_path,'subAuto']);
+end
+
 
 
 %Deleting Thumbfiles; This is specfic to data aquired with Metamorph
-delete('*_thumb_*');
-delete('*[None]*');
+delete([in_path,'*_thumb_*']);
+delete([in_path,'*[None]*']);
 
 % Going through input
 tf=0;
@@ -55,23 +59,23 @@ for i=1:2:length(varargin)-1
 end
 
 %getting basename
-base_name_pre=dir('*w1Brightfield - Camera_s1_t1.tif');
+base_name_pre=dir([in_path,'*w1Brightfield - Camera_s1_t1.tif']);
 ind_base=strfind(base_name_pre(1).name,'_w1');
 movie_base_name=base_name_pre(1).name(1:ind_base-1);
 
 %getting total number of frames
 if tf==0
-    D=dir('*w1Brightfield - Camera_s1_*');
+    D=dir([in_path,'*w1Brightfield - Camera_s1_*']);
     frames=1:length(D);
 end
 
 %getting total number of yfp frames
-D_num_frames_y=dir('*w3YFP - Camera_s1_t*');
+D_num_frames_y=dir([in_path,'*w3YFP - Camera_s1_t*']);
 num_frames_y=length(D_num_frames_y);
 
 %getting number of stage positions
 if sp==0
-    D_stagepos=dir('*w1Brightfield - Camera_s*_t1.tif');
+    D_stagepos=dir([in_path,'*w1Brightfield - Camera_s*_t1.tif']);
     stagepos=length(D_stagepos);  
     pos_to_do=1:stagepos-1;
 end
@@ -80,12 +84,20 @@ end
 dummybase=([movie_base_name,'_*_s*_t*']);
 dbs=strsplit(dummybase,'*');
 
+if ~isnan(do.pos)
+    pos_do_now=do.pos;
+else
+    pos_do_now=1:length(pos_to_do);
+end
 
+if ~isnan(do.frames)
+    frames=do.frames;
+end
 % for do_now=1:length(pos_to_do)
-for do_now=1:length(pos_to_do)
+for do_now=pos_do_now
     %Crop_Frames_func_1(pos_to_do(do_now),dbs,edge_crop,image_folder,crop_folder,num_frames, w1, w2,out_name,chanwidth )
-    try
-        Crop_Frames_func_1_2021_11_22_v1(pos_to_do(do_now),dbs,edge_crop,image_folder,crop_folder,frames, w1, w2,out_name,chanwidth )
-    end
+    %try
+        Crop_Frames_func_1_2021_11_22_v1(pos_to_do(do_now),dbs,edge_crop,image_folder,crop_folder,frames, w1, w2,out_name,chanwidth,in_path)
+    %end
 end      
 

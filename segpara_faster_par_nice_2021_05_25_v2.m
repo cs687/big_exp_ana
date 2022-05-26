@@ -9,7 +9,13 @@ function segpara_faster_par_nice_2021_05_25_v2(p,outprefix,regsize,SAVESEG,range
 % range: vector with frames to segement
 
 %Loop over all frames
-for dude=1:length(range)
+if isnan(p.do_frames)==1
+    frames_do_now=1:length(range);
+else
+    frames_do_now=p.do_frames;
+end
+    
+for dude=frames_do_now
     i=range(dude);
     mynum = str3(i);
     Dframe = dir([p.imageDir p.movieName '*-t*-' str3(i) '.tif']);
