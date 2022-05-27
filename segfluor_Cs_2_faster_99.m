@@ -51,7 +51,7 @@ phsub = ph3(:,:,1);
 %Applying edge detection to segment image
 %%%%%%%%%%%%%%%%%%
 imt = phsub;
-imt = imt - 2000;
+imt = imt - 12000;
 e = edge(imt,'log',0);
 f = imfill(e,'holes');
 L = bwlabel(f);
