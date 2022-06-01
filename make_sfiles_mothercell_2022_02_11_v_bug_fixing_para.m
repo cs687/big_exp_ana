@@ -3,10 +3,11 @@ function make_sfiles_mothercell_2022_02_11_v_bug_fixing_para(p,varargin)
 
 
 
-%% User Settings
+% User Settings
 % clear all; close all;
 % 
-% imgdir ='C:\Users\Chris\Desktop\test_mm\2\2\subAuto'; % no slash at end, input the 'sub' folder
+% imgdir ='C:\Users\Chris\Desktop\test_mm\2\2\subAuto'; 
+% no slash at end, input the 'sub' folder
 % datedir= 'C:\Users\Chris\Desktop\test_mm\2\2\subAuto\2016-06-14';
 %getting varagin
 good_pos=0;
@@ -56,7 +57,7 @@ end
 %                                             e.g. D:\2015-07-07-mothermachine\sub\2015-07-07\dude01_1\segmentation
 % Note the 'date folder', e.g. a folder named '2015-07-07', is found automatically. The basename, e.g. dude, is also found automatically
 
-%%
+%
 %Find datefolder name
 D = dir([imgdir filesep p.movieDate,'*']); 
 D = D(vertcat(D.isdir));
@@ -73,7 +74,7 @@ clear D;
 %     error('current directory and the user'' inputted directory are different');
 % end
 
-%% now running through movies and tracking the top cell from each mask
+% now running through movies and tracking the top cell from each mask
 %Checking which position to do
 if isnan(do.pos)==1
     do_pos_now=1:length(poslist);
@@ -130,23 +131,6 @@ for posctr = do_pos_now;
                 yreg_m(:,:,im_ind)=double(L(1).('yreg'));
                 rreg_m(:,:,im_ind)=double(L(1).('rreg'));
                 
-% %                 Lc = load([segdir D{im_ind}],'Lc'); 
-%                 Lc_m(:,:,im_ind) = Lc(1).('Lc');
-%                 %Add to y stack
-%                 yreg = load([segdir D{im_ind}],'yreg');
-% %                 yreg_m(:,:,im_ind)=double(yreg(1).('yreg'));
-%                 %Add to r stack
-%                 rreg = load([segdir D{im_ind}],'rreg');
-% %                 rreg_m(:,:,im_ind)=double(rreg(1).('rreg'));
-% %                 %Add to Seg stack
-% %                 Lc = load([segdir D{im_ind}],'Lc'); 
-% %                 Lc_m(:,:,im_ind) = Lc(1).('Lc');
-%                 %Add to y stack
-%                 yreg = load([segdir D{im_ind}],'yreg');
-%                 yreg_m(:,:,im_ind)=double(yreg(1).('yreg'));
-%                 %Add to r stack
-%                 rreg = load([segdir D{im_ind}],'rreg');
-%                 rreg_m(:,:,im_ind)=double(rreg(1).('rreg'));
                 % Add to c stack
                 if sum(ismember(colors,'c'))
                    creg = load([segdir D{im_ind}],'creg');

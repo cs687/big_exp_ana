@@ -14,8 +14,9 @@ if isnan(p.do_frames)==1
 else
     frames_do_now=p.do_frames;
 end
-    
+area_out=cell(1,frames_do_now(end));
 for dude=frames_do_now
+    p.do_now=dude;
     i=range(dude);
     mynum = str3(i);
     Dframe = dir([p.imageDir p.movieName '*-t*-' str3(i) '.tif']);
@@ -32,6 +33,7 @@ for dude=frames_do_now
     end
     %actual segementation
     [Lc,phsub,rect,s_end]= segfluor_Cs_2_faster_99(X, p);
+    
     phaseFullSize = size(Lc);
     
     %Stop if there has been a problem with the segmentation
@@ -54,10 +56,17 @@ for dude=frames_do_now
 
     %Loading and resizing fluorecent images
     Lname= [outprefix,mynum];
+    pname= [p.imageDir,p.movieName,'-p-',mynum,'.tif'];
     cname= [p.imageDir,p.movieName,'-c-',mynum,'.tif'];
     yname= [p.imageDir,p.movieName,'-y-',mynum,'.tif'];
     gname= [p.imageDir,p.movieName,'-g-',mynum,'.tif'];
     rname= [p.imageDir,p.movieName,'-t-',mynum,'.tif'];
+    %Phase
+    if exist(pname)==2
+        [preg, pshift, pback, pbinning]= quicknoreg_v2(Lc,pname,rect,regsize,phaseFullSize);
+        savelist=[savelist,',''preg'',''pshift'',''pback'',''pbinning'''];
+    end
+    
     %CFP
     if exist(cname)==2
         [creg, cshift, cback, cbinning]= quicknoreg_v2(Lc,cname,rect,regsize,phaseFullSize);
@@ -78,10 +87,24 @@ for dude=frames_do_now
         [rreg, rshift, rback, rbinning]= quicknoreg_v2(Lc,rname,rect,regsize,phaseFullSize);
         savelist=[savelist,',''rreg'',''rshift'',''rback'',''rbinning'''];
     end
+    
+    f=strfind(savelist,',');
+    for i=1:length(f)+1
+        if i==1;
+            savelistcell{i}=savelist(2:f(1)-2);
+        elseif i==length(f)+1
+            savelistcell{i}=savelist(f(end)+2:end-1);
+        else
+            savelistcell{i}=savelist(f(i-1)+2:f(i)-2);
+        end
+    end
+    
     %Saving data
     timestamp = [];
     if SAVESEG
-        eval(['save(''',p.segmentationDir,Lname,''',',savelist,');']);
+        save([p.segmentationDir,Lname],savelistcell{:});
+        %eval(['save(''',p.segmentationDir,Lname,''',',savelist,');']);
         disp(['saved file ',p.segmentationDir,Lname]);
     end
-end    
+end
+disp('test');

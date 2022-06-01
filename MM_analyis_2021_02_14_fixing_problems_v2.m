@@ -46,6 +46,8 @@ do.pos=nan;
 do.frames=nan;
 do.para_seg=nan;
 do.para_shift=nan;
+do.noise_kill=nan;
+do.para_track=nan;
 if length(varargin)>0
     for i = 1:2:length(varargin),
         theparam = lower(varargin{i});
@@ -65,7 +67,12 @@ if length(varargin)>0
             case 'do_para_seg'
                 do.para_seg=varargin{i+1};
             case 'do_para_shift'
-                do.para_shift=varargin{i+1}; 
+                do.para_shift=varargin{i+1};
+            case 'do_para_track'
+                do.para_track=varargin{i+1};
+            case 'do_noise_kill'
+                do.noise_kill=varargin{i+1};%not really needed
+                
         end
     end
 end
@@ -87,6 +94,12 @@ if isnan(do.para_seg)
 end
 if isnan(do.para_shift)
     do.para_shift=1;
+end
+if isnan(do.para_track)
+    do.para_track=1;
+end
+if isnan(do.noise_kill)
+    do.noise_kill=0;
 end
 
 if in_path(end)~='\'
@@ -128,12 +141,12 @@ if ismember(2,todo);
     if do.para_seg==1
         parfor i=pos_do_now
             p = initschnitz(D(i).name(1:11),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
-            p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
+            p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames,'do_noise',do.noise_kill);
         end
     else
         for i=pos_do_now
             p = initschnitz(D(i).name(1:11),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
-            p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
+            p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames,'do_noise',do.noise_kill);
         end
     end
         
@@ -165,7 +178,8 @@ if ismember(3,todo);
     if ismember(seg,1)
         p=track_all_Cells_2019_06_13_v6(p,range);
     elseif ismember(seg,2);
-        make_sfiles_mothercell_2022_02_11_v_bug_fixing_para(p,'do',do)
+        %make_sfiles_mothercell_2022_02_11_v_bug_fixing_para(p,'do',do)
+        make_sfiles_mothercell_2022_05_27_v1(p,'do',do);
         ind=calc_promo_21_11_01_BMM2(p);
         plotting_MM_data_2021_11_01_v3(p,what_plot)
     end   
