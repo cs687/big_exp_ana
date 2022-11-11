@@ -21,8 +21,8 @@ for i=1:length(D)
         xlabel('frames');
         ylabel(what_plot);
         a=axis;
-        %axis([0, a(2), 0 4000]);
-        axis([0, 110, 0 1000]);
+        axis([0, a(2), 0 4000]);
+        %axis([0, 110, 0 1000]);
         vline(36.5);
         title(strrep(D(i).name,'_',' '));
         clear MY

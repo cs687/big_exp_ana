@@ -20,19 +20,19 @@ for i=1:length(D)
         plot(eval(what_plot));
         xlabel('frames');
         ylabel(what_plot);
-        
+        a=axis
         if strcmp(what_plot,'MY');
-            axis([0, 800, 0 5000]);
+            axis([0, a(2), 0 5000]);
             vline(37);
         elseif strcmp(what_plot,'AYlen');
-            axis([0, 110, 0 1000]);
+            axis([0, a(2), 0 1000]);
             vline(36.5);
         end
         title(strrep(D(i).name,'_',' '));
         a=axis;
         current_data=eval(what_plot);
         text(a(2)*0.7,a(4)*0.9,['n_{start}: ',num2str(sum(~isnan(current_data(1,:))))]);
-        text(a(2)*0.7,a(4)*0.75,['n_{end}: ',num2str(sum(~isnan(current_data(800,:))))]);
+        text(a(2)*0.7,a(4)*0.75,['n_{end}: ',num2str(sum(~isnan(current_data(77,:))))]);
         clear(what_plot);
     end
 end

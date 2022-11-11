@@ -97,11 +97,11 @@ for posctr = do_pos_now;
 
     
     %try
-    if length(D)>10;
+    if length(D)>20;
         if isnan(do.frames(end))~=1&&length(D)>=do.frames(end)
             do_frames_now=1:do.frames(end);
         else
-           do_frames_now=1:length(poslist);
+           do_frames_now=1:length(D);
         end
         for im_ind=do_frames_now
             if im_ind==1
@@ -163,6 +163,8 @@ for posctr = do_pos_now;
         else
             [channels,~]=peakfinder_2016(mean(mean(Lc_m(end-200:end,:,:),3)),0.3);
         end
+        good_channels=channels>21&channels<2048-20;
+        channels=channels(good_channels);
         
 %         %channels=dlmread([imgdir,'channel_pos_',poslist{posctr}(10:11),'.txt']);
 

@@ -150,11 +150,12 @@ end
 % 3. Tracking
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 what_plot='AYlen';
-% if exist([p.rootDir,'2021-11-03'])
+%if exist([p.rootDir,'2021-11-03'])
+if exist([p.rootDir,date_out])
     p = initschnitz('Bacillus-01',date_out,'bacillus','rootDir',in_path,'imageDir',in_path);
-% else
-%     p = initschnitz('Bacillus-01','2016-06-14','bacillus','rootDir',cd,'imageDir',cd);
-% end
+else
+    p = initschnitz('Bacillus-01',date_in,'bacillus','rootDir',cd,'imageDir',cd);
+end
 
 p.dataDir=[p.rootDir,'Data\'];
 if ismember(3,todo);
