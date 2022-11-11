@@ -105,7 +105,8 @@ date_out='2022-04-52';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 if ismember(1,todo);
     %Finding_channels_and_rotate_2021_10_08_v3
-    Finding_channels_and_rotate_2021_11_22_v3(in_path,do)
+%    Finding_channels_and_rotate_2021_11_22_v3(in_path,do) %old scope
+    Finding_channels_and_rotate_TI2_2021_11_11_v4(in_path,do) %new scope
 %     Finding_channels_and_rotate_2021_11_06_v3
     %Finding_channels_and_rotate_2021_10_08_v3('PosList',50:56);
 end
