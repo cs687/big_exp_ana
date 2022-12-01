@@ -123,17 +123,26 @@ else
     pos_do_now=do.pos;
 end
 
+%this is taking care of the case of more than 99 positions
+if length(D)>99
+    names={D.name};
+    f_pre=cellfun(@(a) findstr(a,'-'),names,'UniformOutput',false);
+    f=cell2mat(cellfun(@(a) a(2)-1,f_pre,'UniformOutput',false));
+else
+    f=ones(length(D),1)*11;
+end
 
 if ismember(2,todo);
+
     %checking if doing parallel segmentation
     if do.para_seg==1
         parfor i=pos_do_now
-            p = initschnitz(D(i).name(1:11),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+            p = initschnitz(D(i).name(1:f(i)),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
             p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
         end
     else
         for i=pos_do_now
-            p = initschnitz(D(i).name(1:11),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+            p = initschnitz(D(i).name(1:f(i)),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
             p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
         end
     end
@@ -141,7 +150,7 @@ if ismember(2,todo);
 end
 
 %Correction shift
-p = initschnitz(D(1).name(1:11),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+p = initschnitz(D(1).name(1:f(1)),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
 if correct_shift==1
     correcting_shift_2022_02_11_v3_speedy(p,date_out,do);
 end
@@ -151,9 +160,9 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 what_plot='AYlen';
 % if exist([p.rootDir,'2021-11-03'])
-    p = initschnitz('Bacillus-01',date_out,'bacillus','rootDir',in_path,'imageDir',in_path);
+%    p = initschnitz('Bacillus-01',date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
 % else
-%     p = initschnitz('Bacillus-01','2016-06-14','bacillus','rootDir',cd,'imageDir',cd);
+     p = initschnitz('Bacillus-01',date_out,'bacillus','rootDir',in_path,'imageDir',in_path);
 % end
 
 p.dataDir=[p.rootDir,'Data\'];
@@ -175,12 +184,16 @@ end
 if do_plot==1&&~ismember(3,todo);
     %Plotting AYlen
     what_plot='AYlen';
-    plotting_MM_data_2021_11_05_v3_all(p,what_plot)
-    saveas(gcf,[p.dataDir,in_path(end-10:end-1),'_',what_plot,'.pdf']);
+    plotting_MM_data_2021_11_01_v3(p,what_plot)
+%    plotting_MM_data_2021_11_05_v3_all(p,what_plot)
+%     saveas(gcf,[p.dataDir,in_path(end-10:end-1),'_',what_plot,'.pdf']);
+saveas(gcf,[p.dataDir,what_plot,'.pdf']);
     %plotting MY
     what_plot='MY';
-    plotting_MM_data_2021_11_05_v3_all(p,what_plot)
-    saveas(gcf,[p.dataDir,in_path(end-10:end-1),'_',what_plot,'.pdf'])
+    plotting_MM_data_2021_11_01_v3(p,what_plot)
+%    plotting_MM_data_2021_11_05_v3_all(p,what_plot)
+%     saveas(gcf,[p.dataDir,in_path(end-10:end-1),'_',what_plot,'.pdf'])
+saveas(gcf,[p.dataDir,what_plot,'.pdf']);
 end
 
 toc;

@@ -48,8 +48,10 @@ clear(all_c_name{:});
 file_names=whos('a_s_Bac*');
 
 names_cell={file_names.name};
+ind_val=cell2mat(cellfun(@(a) str2num(a(14:end-3)),names_cell,'UniformOutput',false));
+
 file_names_mat=char(names_cell);
-ind_val=str2num(file_names_mat(:,14:15));
+% ind_val=str2num(file_names_mat(:,14:end-3));
 
 % for ii = 1:length(file_names)
 %     eval(['R.',file_names(ii).name,'=',file_names.name,';']);

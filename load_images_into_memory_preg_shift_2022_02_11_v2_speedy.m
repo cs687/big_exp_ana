@@ -4,6 +4,7 @@ function [Lc_m,rreg_m,yreg_m]=load_images_into_memory_preg_shift_2022_02_11_v2_s
 %Script to load all images into memory 
 p_out = initschnitz(poslist{pos_now},date_out,'bacillus','rootDir',p.imageDir,'imageDir',p.imageDir);
 p = initschnitz(poslist{pos_now},date_in,'bacillus','rootDir',p.imageDir,'imageDir',p.imageDir);
+buffer_im=300;
 
 
 disp(poslist(posctr));
@@ -23,6 +24,7 @@ end
 mat_zero_size=length(range_do);
 D = dir([p.segmentationDir '*.mat']); 
 D = {D.name};
+shift_hist=zeros(length(range_do),1);
     
     for im_ind=range_do
         Lc = load([segdir D{im_ind}],'Lc','yreg','rreg'); 
@@ -37,7 +39,7 @@ D = {D.name};
         rreg_m=double(Lc(1).('rreg'));
         
         if im_ind==1
-            Lc_mean=zeros(size(Lc_m,1),size(Lc_m,2)+100);
+            Lc_mean=zeros(size(Lc_m,1),size(Lc_m,2)+buffer_im);
 %              Lc = load([segdir D{im_ind}],'Lc');
 %              L= Lc(im_ind).('Lc');
 % %              L2 = bwlabel(L,4);
@@ -68,11 +70,14 @@ D = {D.name};
         end
             channels=finding_channels_2022_02_10_v1(channels,Lc_m,im_ind);
             if do_phase==1
-                [Lc,rreg,yreg,preg]=shift_x_2022_02_10_v1_speedy(Lc_m,rreg_m,yreg_m,preg_m,channels,im_ind,do_phase);
+                [Lc,rreg,yreg,shift_hist,do_stop,preg]=shift_x_2022_02_10_v1_speedy(Lc_m,rreg_m,yreg_m,preg_m,channels,im_ind,do_phase,shift_hist,buffer_im);
             else
-                [Lc,rreg,yreg]=shift_x_2022_02_10_v1_speedy(Lc_m,rreg_m,yreg_m,preg_m,channels,im_ind,do_phase);
+                [Lc,rreg,yreg,shift_hist,do_stop]=shift_x_2022_02_10_v1_speedy(Lc_m,rreg_m,yreg_m,preg_m,channels,im_ind,do_phase,shift_hist,buffer_im);
             end 
             
+            if do_stop==1
+                break;
+            end
             if do_phase==1
                 save([p_out.segmentationDir,D{im_ind}],'Lc','yreg','rreg','preg');
             else

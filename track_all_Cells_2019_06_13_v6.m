@@ -18,6 +18,7 @@ imgDir=p.imageDir;
 %poslist(7)=[];
 
 %Loop over all positions
+delete(gcp('nocreate'));
 parpool(3);
 parfor posctr=1:length(poslist)
 %for posctr=1:length(poslist)

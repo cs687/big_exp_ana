@@ -45,7 +45,7 @@ D_pos=dir([imgdir,date1,'\Bacillus-*']);
 poslist_pre = {D_pos.name};
 
 for i=1:length(poslist_pre)
-    poslist{i}=poslist_pre{i}(1:11);
+    poslist{i}=poslist_pre{i}(1:end);
 end
 %poslist = {D_pos.name}; %as string, e.g. {'01_1' '01_2' '01_3' '02_1'}
 
@@ -81,7 +81,7 @@ else
     do_pos_now=do.pos;
 end
 
-
+mkdir(imgdir,'Data');
 for posctr = do_pos_now;
     disp(poslist(posctr));
       p = initschnitz(poslist{posctr},...
@@ -96,12 +96,12 @@ for posctr = do_pos_now;
    
 
     
-    %try
+    try
     if length(D)>10;
         if isnan(do.frames(end))~=1&&length(D)>=do.frames(end)
             do_frames_now=1:do.frames(end);
         else
-           do_frames_now=1:length(poslist);
+           do_frames_now=1:length(D);
         end
         for im_ind=do_frames_now
             if im_ind==1
@@ -163,6 +163,8 @@ for posctr = do_pos_now;
         else
             [channels,~]=peakfinder_2016(mean(mean(Lc_m(end-200:end,:,:),3)),0.3);
         end
+        good_channels=channels>21&channels<2048-20;
+        channels=channels(good_channels);
         
 %         %channels=dlmread([imgdir,'channel_pos_',poslist{posctr}(10:11),'.txt']);
 
@@ -175,197 +177,201 @@ for posctr = do_pos_now;
         text(a(2)*0.4,a(1)*0.05,poslist(posctr),'color','w');
         clear('Lc','rreg','yreg');
 
+        if length(channels)<=30
+            for c=1:length(channels)
+            %for c=1:3
 
-        for c=1:length(channels)
-        %for c=1:3
+                disp(c);
+                Lc_c=Lc_m(:,channels(c)-20:channels(c)+20,:);
+                yreg_c=yreg_m(:,channels(c)-20:channels(c)+20,:);
+                rreg_c=rreg_m(:,channels(c)-20:channels(c)+20,:);
+                %declare the s structure
+                s = struct('frames',[],'P',[],'D',[],'E',[],'len',[],'wid',[],'MC',[],'MY',[],'MR',[],'cellno',[],'channel_pos',[]);
+                sch_num = 1; sch_age = 0;
 
-            disp(c);
-            Lc_c=Lc_m(:,channels(c)-20:channels(c)+20,:);
-            yreg_c=yreg_m(:,channels(c)-20:channels(c)+20,:);
-            rreg_c=rreg_m(:,channels(c)-20:channels(c)+20,:);
-            %declare the s structure
-            s = struct('frames',[],'P',[],'D',[],'E',[],'len',[],'wid',[],'MC',[],'MY',[],'MR',[],'cellno',[],'channel_pos',[]);
-            sch_num = 1; sch_age = 0;
+                p = initschnitz(poslist{posctr},...
+                datestr,...
+                'bacillus',...
+                'rootDir',imgdir,...
+                'imageDir',imgdir); 
+                segdir = p.segmentationDir;
+                D = dir([segdir '*.mat']); D = {D.name};
 
-            p = initschnitz(poslist{posctr},...
-            datestr,...
-            'bacillus',...
-            'rootDir',imgdir,...
-            'imageDir',imgdir); 
-            segdir = p.segmentationDir;
-            D = dir([segdir '*.mat']); D = {D.name};
+                s.channel_pos=channels(c);
 
-            s.channel_pos=channels(c);
+                trackdir = p.tracksDir;
+                %D = dir([segdir '*' poslist{posctr} '*']); D = {D.name};
+                %D = dir([segdir '*.mat']); D = {D.name};
 
-            trackdir = p.tracksDir;
-            %D = dir([segdir '*' poslist{posctr} '*']); D = {D.name};
-            %D = dir([segdir '*.mat']); D = {D.name};
+                % loop thru all seg files, listed in 'D', and extract data. 
+                % assume the 'highest' cell in each frame is the mother cell
+                s_frames=size(Lc_c);
+                for segctr = 1:s_frames(3)  
+                    save_no=0;
+                %for segctr = 1:180
+                    %resetting variables....why is this necessary?
+                    cell_m = -100;
+                    cell_s = -100;
 
-            % loop thru all seg files, listed in 'D', and extract data. 
-            % assume the 'highest' cell in each frame is the mother cell
-            s_frames=size(Lc_c);
-            for segctr = 1:s_frames(3)  
-                save_no=0;
-            %for segctr = 1:180
-                %resetting variables....why is this necessary?
-                cell_m = -100;
-                cell_s = -100;
+                    %load mask, 'Lc',
+                    %Lc = load([segdir D{segctr}],'Lc'); Lc = Lc(1).('Lc');
+                    Lc=Lc_c(:,:,segctr);
+                    %s_int = load([segdir D{segctr}]); Lc = s_int.s_c.Lc;
+                    if sch_num==1
+                        s(sch_num).approved =1;
+                    end             
+                    %extract cell length & other properties
+                    r = regionprops(Lc,'MajorAxisLength','MinorAxisLength','Centroid');
 
-                %load mask, 'Lc',
-                %Lc = load([segdir D{segctr}],'Lc'); Lc = Lc(1).('Lc');
-                Lc=Lc_c(:,:,segctr);
-                %s_int = load([segdir D{segctr}]); Lc = s_int.s_c.Lc;
-                if sch_num==1
-                    s(sch_num).approved =1;
-                end             
-                %extract cell length & other properties
-                r = regionprops(Lc,'MajorAxisLength','MinorAxisLength','Centroid');
+                    %find 'highest'/2nd 'highest' cell, in cell_m and cell_s(are indices to r and Lc)
+                    cens = vertcat(r.Centroid);
+                    if isempty(cens)==1
+                        break;
+                    end
+                    cenys = sort(cens(:,2));
+                    cell_m = find(cens(:,2) == cenys(1));
 
-                %find 'highest'/2nd 'highest' cell, in cell_m and cell_s(are indices to r and Lc)
-                cens = vertcat(r.Centroid);
-                if isempty(cens)==1
-                    break;
-                end
-                cenys = sort(cens(:,2));
-                cell_m = find(cens(:,2) == cenys(1));
-
-                try cell_s = find(cens(:,2) == cenys(2)); catch; end;
-                if isempty(cell_s)==1
-                    if length(s)==1
+                    try cell_s = find(cens(:,2) == cenys(2)); catch; end;
+                    if isempty(cell_s)==1
+                        if length(s)==1
+                            save_no=1;
+                        end
+                        break;
+                    end
+                    if cell_s<=0
                         save_no=1;
+                        break;
                     end
-                    break;
-                end
-                if cell_s<=0
-                    save_no=1;
-                    break;
-                end
-                clear cens cenys;       
+                    clear cens cenys;       
 
-                %debugging code
-                %disp([cell_m cell_s]);
-                %close all; myfig = figure; imshow(Lc,[]); impixelinfo; figure(myfig);
-                %s;
+                    %debugging code
+                    %disp([cell_m cell_s]);
+                    %close all; myfig = figure; imshow(Lc,[]); impixelinfo; figure(myfig);
+                    %s;
 
-                %check if cell has divided, remember we haven't updated sch_num and sch_age yet
-                division_detected = 0;
-                if sch_age > 1 
-                    if r(cell_m).MajorAxisLength < .75*s(sch_num).len(sch_age) %if it has divided                
-                        division_detected = 1;
+                    %check if cell has divided, remember we haven't updated sch_num and sch_age yet
+                    division_detected = 0;
+                    if sch_age > 1 
+                        if r(cell_m).MajorAxisLength < .75*s(sch_num).len(sch_age) %if it has divided                
+                            division_detected = 1;
+                        end
                     end
-                end
 
-                if division_detected == 1
-                    store_sch = sch_num;
-                    sch_num = length(s) + 1; %sch_num is now set to the sch of the new mother cell
-                    sch_age = 1;
+                    if division_detected == 1
+                        store_sch = sch_num;
+                        sch_num = length(s) + 1; %sch_num is now set to the sch of the new mother cell
+                        sch_age = 1;
 
-                    s(store_sch).D = sch_num;
-                    s(sch_num).P = store_sch;            
-                else %if division event not detected
-                    sch_age = sch_age + 1;
-                end
+                        s(store_sch).D = sch_num;
+                        s(sch_num).P = store_sch;            
+                    else %if division event not detected
+                        sch_age = sch_age + 1;
+                    end
 
-                % add various fields to s for mother cell                      
-                s(sch_num).frames(sch_age) = segctr;                 
-                s(sch_num).len(sch_age) = r(cell_m).MajorAxisLength;
-                s(sch_num).wid(sch_age) = r(cell_m).MinorAxisLength;          
-                s(sch_num).cellno(sch_age) = cell_m;
-                s(sch_num).cenx(sch_age) = r(cell_m).Centroid(1);
-                s(sch_num).ceny(sch_age) = r(cell_m).Centroid(2);
+                    % add various fields to s for mother cell                      
+                    s(sch_num).frames(sch_age) = segctr;                 
+                    s(sch_num).len(sch_age) = r(cell_m).MajorAxisLength;
+                    s(sch_num).wid(sch_age) = r(cell_m).MinorAxisLength;          
+                    s(sch_num).cellno(sch_age) = cell_m;
+                    s(sch_num).cenx(sch_age) = r(cell_m).Centroid(1);
+                    s(sch_num).ceny(sch_age) = r(cell_m).Centroid(2);
 
-                % add fluorescence properties to s for mother cell, by first loading yreg,creg, for mother cell
-                %try
-                if sum(ismember(colors,'y'))
-                    %yreg = load([segdir D{segctr}],'yreg'); yreg = double(yreg(1).('yreg'));
-                    yreg=yreg_c(:,:,segctr);
-                    %yreg= s_int.s_c.yreg;
-                    s(sch_num).MY(sch_age) = mean(yreg(Lc == cell_m));
-                end
-                if sum(ismember(colors,'c'))
-                    %creg = load([segdir D{segctr}],'creg'); creg =
-                    creg = creg_c(:,:,segctr);
-                    %creg= s_int.s_c.creg;
-                    s(sch_num).MC(sch_age) = mean(creg(Lc == cell_m));
-                end
-                if sum(ismember(colors,'r'))
-                    %rreg = load([segdir D{segctr}],'rreg'); rreg = double(rreg(1).('rreg'));
-                    rreg =rreg_c(:,:,segctr);
-                    %rreg= s_int.s_c.rreg;
-                    s(sch_num).MR(sch_age) = mean(rreg(Lc == cell_m));
-                end
-
-                % below is all code pertaining to the mother cell's other daughter
-                if division_detected == 1        
-                    sch_num = length(s) + 1; %sch_num is now set to the lineage of the mother's other daughter
-                    s(sch_num).approved =1;
-                    s(sch_num).P = store_sch; %a bit confusing...
-                    s(store_sch).E = sch_num; %a bit confusing...
-                    s(sch_num).frames = segctr;            
-                    s(sch_num).len(sch_age) = r(cell_s).MajorAxisLength;
-                    s(sch_num).wid(sch_age) = r(cell_s).MinorAxisLength;  
-                    s(sch_num).cellno(sch_age) = cell_s;
-                    s(sch_num).cenx(sch_age) = r(cell_s).Centroid(1);
-                    s(sch_num).ceny(sch_age) = r(cell_s).Centroid(2);
+                    % add fluorescence properties to s for mother cell, by first loading yreg,creg, for mother cell
                     %try
-                    %if sum(ismember(colors,'y')) && mod(segctr+y_im_int-1,y_im_int)==0
+                    if sum(ismember(colors,'y'))
                         %yreg = load([segdir D{segctr}],'yreg'); yreg = double(yreg(1).('yreg'));
-                        
-                        %yreg=yreg_c(:,:,segctr); commented out 2022.02.11
+                        yreg=yreg_c(:,:,segctr);
                         %yreg= s_int.s_c.yreg;
-                        s(sch_num).MY(sch_age) = mean(yreg(Lc == cell_s));
-                    %else
-                     %   s(sch_num).MY(sch_age)=0;
-                    %catch
-                   % end
-                    %try 
-                    if sum(ismember(colors,'c'))
-                        %creg = creg_c(:,:,segctr);
-                        %creg = load([segdir D{segctr}],'creg'); creg = double(creg(1).('creg'));
-                        %creg= s_int.s_c.creg;
-                        s(sch_num).MC(sch_age) = mean(creg(Lc == cell_s));
-                    %catch
+                        s(sch_num).MY(sch_age) = mean(yreg(Lc == cell_m));
                     end
-                    %try
+                    if sum(ismember(colors,'c'))
+                        %creg = load([segdir D{segctr}],'creg'); creg =
+                        creg = creg_c(:,:,segctr);
+                        %creg= s_int.s_c.creg;
+                        s(sch_num).MC(sch_age) = mean(creg(Lc == cell_m));
+                    end
                     if sum(ismember(colors,'r'))
                         %rreg = load([segdir D{segctr}],'rreg'); rreg = double(rreg(1).('rreg'));
+                        rreg =rreg_c(:,:,segctr);
                         %rreg= s_int.s_c.rreg;
-                        %rreg =rreg_c(:,:,segctr);
-                        s(sch_num).MR(sch_age) = mean(rreg(Lc == cell_s));
-                    %catch
+                        s(sch_num).MR(sch_age) = mean(rreg(Lc == cell_m));
                     end
-                    sch_num = sch_num - 1; %sch_num is now reset to the mother cell's main daughter
-                    s(sch_num).approved =1;
+
+                    % below is all code pertaining to the mother cell's other daughter
+                    if division_detected == 1        
+                        sch_num = length(s) + 1; %sch_num is now set to the lineage of the mother's other daughter
+                        s(sch_num).approved =1;
+                        s(sch_num).P = store_sch; %a bit confusing...
+                        s(store_sch).E = sch_num; %a bit confusing...
+                        s(sch_num).frames = segctr;            
+                        s(sch_num).len(sch_age) = r(cell_s).MajorAxisLength;
+                        s(sch_num).wid(sch_age) = r(cell_s).MinorAxisLength;  
+                        s(sch_num).cellno(sch_age) = cell_s;
+                        s(sch_num).cenx(sch_age) = r(cell_s).Centroid(1);
+                        s(sch_num).ceny(sch_age) = r(cell_s).Centroid(2);
+                        %try
+                        %if sum(ismember(colors,'y')) && mod(segctr+y_im_int-1,y_im_int)==0
+                            %yreg = load([segdir D{segctr}],'yreg'); yreg = double(yreg(1).('yreg'));
+
+                            %yreg=yreg_c(:,:,segctr); commented out 2022.02.11
+                            %yreg= s_int.s_c.yreg;
+                            s(sch_num).MY(sch_age) = mean(yreg(Lc == cell_s));
+                        %else
+                         %   s(sch_num).MY(sch_age)=0;
+                        %catch
+                       % end
+                        %try 
+                        if sum(ismember(colors,'c'))
+                            %creg = creg_c(:,:,segctr);
+                            %creg = load([segdir D{segctr}],'creg'); creg = double(creg(1).('creg'));
+                            %creg= s_int.s_c.creg;
+                            s(sch_num).MC(sch_age) = mean(creg(Lc == cell_s));
+                        %catch
+                        end
+                        %try
+                        if sum(ismember(colors,'r'))
+                            %rreg = load([segdir D{segctr}],'rreg'); rreg = double(rreg(1).('rreg'));
+                            %rreg= s_int.s_c.rreg;
+                            %rreg =rreg_c(:,:,segctr);
+                            s(sch_num).MR(sch_age) = mean(rreg(Lc == cell_s));
+                        %catch
+                        end
+                        sch_num = sch_num - 1; %sch_num is now reset to the mother cell's main daughter
+                        s(sch_num).approved =1;
+                    end
+
+
+                    %clear Lc Lc_c len r yreg yreg_c creg creg_c yreg yreg_c creg rreg;
+                    %clear Lc  len r yreg  creg  yreg  creg rreg;
                 end
+                s(1).segmentationDir = p.segmentationDir;
+                s(1).movieName = p.movieName;
 
+                for ctr = 1:length(s)
+                    if isempty(s(ctr).D); s(ctr).D = 0; end;
+                    if isempty(s(ctr).E); s(ctr).E = 0; end;
+                end
+                clear ctr;
 
-                %clear Lc Lc_c len r yreg yreg_c creg creg_c yreg yreg_c creg rreg;
-                %clear Lc  len r yreg  creg  yreg  creg rreg;
+                if save_no==0
+                    eval(['s_'  strrep(poslist{posctr},'-','_'), '_', str2(c), ' = s;']);
+                    %eval(['save(''',trackdir, 's_',  strrep(poslist{posctr},'-','_'),''',', ''''')'])
+                end
+                clear segctr D ctr segdir p s 
             end
-            s(1).segmentationDir = p.segmentationDir;
-            s(1).movieName = p.movieName;
-
-            for ctr = 1:length(s)
-                if isempty(s(ctr).D); s(ctr).D = 0; end;
-                if isempty(s(ctr).E); s(ctr).E = 0; end;
-            end
-            clear ctr;
-
-            if save_no==0
-                eval(['s_'  strrep(poslist{posctr},'-','_'), '_', str2(c), ' = s;']);
-                %eval(['save(''',trackdir, 's_',  strrep(poslist{posctr},'-','_'),''',', ''''')'])
-            end
-            clear segctr D ctr segdir p s 
         end
         clear Lc_m yreg_m reg_m rreg_m Lc_c yreg_c creg_c rreg_c;
         %clear segctr D ctr segdir p s;
     end
-    
-%     catch
-%         disp(['Problem ',D{im_ind}]);
-%     end
+    all_s=whos('s_Bacillus*');
+all_s={all_s.name};
+data_D=dir([imgdir,'Data\']);
+save([imgdir,'Data\','all_schnitz_',str2(length(data_D)),'m.mat'],all_s{:});
+    catch
+         disp(['Problem ']);
+    end
 end
-mkdir(imgdir,'Data');
+
 all_s=whos('s_Bacillus*');
 all_s={all_s.name};
 data_D=dir([imgdir,'Data\']);

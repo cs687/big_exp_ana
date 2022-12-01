@@ -2,7 +2,7 @@ function correcting_shift_2022_02_11_v3_speedy(p,date_out_in,do)
 %colors='ry';
 do_phase=1;
 savelist='''phsub'',''LNsub'',''Lc'',''tempsegcorrect'',''rect'',''timestamp'',''phaseFullSize'',''yreg'',''yshift'',''yback'',''ybinning'',''rreg'',''rshift'',''rback'',''rbinning''';
-poslist=get_poslist(p);
+poslist=get_poslist_shift(p);
 %poslist=poslist([1:6,8:end]);
 D_all=dir([p.segmentationDir,'Bacillus-01-p-*']);
 date_in=p.movieDate;
