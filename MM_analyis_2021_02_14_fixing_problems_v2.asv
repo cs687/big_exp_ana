@@ -117,8 +117,6 @@ date_out='2022-04-52';
 do.phase_name='w1Phase';
 do.rfp_name='w2RFP - Camera';
 do.yfp_name='w3YFP - Camera';
-do.cfp_name=nan;
-do.gfp_name=nan;
 
 
 %path=in_path;
@@ -164,7 +162,6 @@ if ismember(2,todo);
     %case of roatated data
     if do.rot==1
         %Special case if more than 100 pos
-         D=dir([in_path,'*p-001.tif']);
         if length(D)>99
             names={D.name};
             f_pre=cellfun(@(a) findstr(a,'-'),names,'UniformOutput',false);
@@ -176,15 +173,12 @@ if ismember(2,todo);
         if do.para_seg==1
             parfor i=pos_do_now
                 p = initschnitz(D(i).name(1:f(i)),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
-                %p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
-                p = segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,'segRange',do.frames);
+                p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
             end
         else
             for i=pos_do_now
                 p = initschnitz(D(i).name(1:f(i)),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
-                %p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
-                p.do=do;
-                p = segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,'segRange',do.frames);
+                p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
             end
         end
     else
@@ -199,13 +193,11 @@ if ismember(2,todo);
         if do.para_seg==1
             parfor i=pos_do_now
                 p = initschnitz([movie_base,'-',names{i}(f_pre{i}(2)+2:f_pre{i}(3)-1)],date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
-                p.do=do;
-                p.imageDir=p.imageDir(1:end-8);
                 p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
             end
         else
             for i=pos_do_now
-                p = initschnitz([movie_base,'-',str3(str2num(names{i}(f_pre{i}(2)+2:f_pre{i}(3)-1)))],date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+                p = initschnitz([movie_base,'-',names{i}(f_pre{i}(2)+2:f_pre{i}(3)-1)],date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
                 p.do=do;
                 p.imageDir=p.imageDir(1:end-8);
                 p = segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,'segRange',do.frames);

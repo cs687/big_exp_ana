@@ -107,6 +107,7 @@ bw2 = ismember(L4, flittle);
 L5 = bwlabel(bw2,4);
 L=L5;
 
+figure; imshowlabel(L5);
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %Final Checks
