@@ -28,17 +28,17 @@ end
                
     
 imgdir = p.imageDir; % no slash at end, input the 'sub' folder
-%datedir= p.dateDir;
+datedir= p.dateDir;
 date1=p.movieDate;
 
 colors='ry';
-%y_im_int=3;
+y_im_int=3;
 
 %Finding basename
-% basenamedir = dir([imgdir filesep '*-*-y-001.tif']);
-% basenamesetpoints = strfind(basenamedir(1).name,'-');
-% basename = basenamedir(1).name(1:basenamesetpoints(1)-1);  
-% clear basenamedir basenamesetpoints;
+basenamedir = dir([imgdir filesep '*-*-y-001.tif']);
+basenamesetpoints = strfind(basenamedir(1).name,'-');
+basename = basenamedir(1).name(1:basenamesetpoints(1)-1);  
+clear basenamedir basenamesetpoints;
 
 %D_pos=dir('*-p-001.tif');
 D_pos=dir([imgdir,date1,'\Bacillus-*']);

@@ -23,8 +23,8 @@ for i=frames_do_now
     else
         mynum = num2str(i);
         f=strfind(p.movieName,'-');
-        base_name=[p.movieName(1:f(1)-1),'_'];
-        pos_name=['_s',p.movieName(f(1)+1:end),'_t',mynum,'.tif'];
+        base_name=([p.movieName(1:f(1)-1),'_']);
+        pos_name=['_s',num2str(str2double(p.movieName(f(1)+1:end))),'_t',mynum,'.tif'];
         Dframe = dir([p.imageDir,base_name,p.do.rfp_name,pos_name]);
         pname = Dframe(1).name;
     end
@@ -33,6 +33,7 @@ for i=frames_do_now
 
     %actual segementation
     [Lc,phsub,rect,s_end]= segfluor_Cs_2_faster_99(X, p);
+    preg=phsub;
     phaseFullSize = size(Lc);
     
     %Stop if there has been a problem with the segmentation
@@ -46,7 +47,8 @@ for i=frames_do_now
     %Setting correction to 1.
     tempsegcorrect=1;
     LNsub=Lc;
-    savelist=['''phsub'',''LNsub'',''Lc'',''tempsegcorrect'',''rect'',''timestamp'',''phaseFullSize'''];
+    %savelist=['''phsub'',''LNsub'',''Lc'',''tempsegcorrect'',''rect'',''timestamp'',''phaseFullSize'''];
+    savelist=['''preg'',''Lc'',''tempsegcorrect'',''rect'',''timestamp'',''phaseFullSize'''];
     % nitzan 2005June25 added the following to save both phases if different:
     if p.segmentationPhaseSlice~=p.prettyPhaseSlice
         phseg = phsub(:,:,p.segmentationPhaseSlice);

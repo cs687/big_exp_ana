@@ -47,13 +47,13 @@ do.pos=nan;
 do.frames=nan;
 do.para_seg=nan;
 do.para_shift=nan;
-if length(varargin)>0
-    for i = 1:2:length(varargin),
+if ~isempty(varargin)
+    for i = 1:2:length(varargin)
         theparam = lower(varargin{i});
-        switch(strtok(theparam)),
-            case 'todo',
+        switch(strtok(theparam))
+            case 'todo'
                 todo=varargin{i+1};
-            case 'seg',
+            case 'seg'
                 seg=varargin{i+1};
             case 'plot'
                 do_plot=varargin{i+1};
@@ -88,9 +88,9 @@ if isnan(do.rot)&&sum(ismember(todo,1))
 end
     
 if isnan(todo)
-    todo=[1:3];
+    todo=1:3;
 end
-if isnan(seg);
+if isnan(seg)
     seg=1;
 end
 if isnan(do_plot)
@@ -117,6 +117,8 @@ date_out='2022-04-52';
 do.phase_name='w1Phase';
 do.rfp_name='w2RFP - Camera';
 do.yfp_name='w3YFP - Camera';
+do.cfp_name=nan;
+do.gfp_name=nan;
 
 
 %path=in_path;
@@ -125,7 +127,7 @@ do.yfp_name='w3YFP - Camera';
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 1. Pre-Analysis 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-if ismember(1,todo)&&do.rot==1;
+if ismember(1,todo)&&do.rot==1
     %Finding_channels_and_rotate_2021_10_08_v3
 %    Finding_channels_and_rotate_2021_11_22_v3(in_path,do) %old scope
     Finding_channels_and_rotate_TI2_2021_11_11_v4(in_path,do) %new scope
@@ -139,7 +141,7 @@ end
 %finding number of posiutions
 % D=dir([in_path,'*p-001.tif']);
 if isnan(do.pos)
-    if ismember(1,todo)&&do.rot==1;
+    if ismember(1,todo)&&do.rot==1
         D=dir([in_path,'subAuto\*p-001.tif']);
         pos_do_now=1:length(D);
     else
@@ -152,58 +154,97 @@ end
 
 %making folder for output
 in_path=[in_path,'subAuto\'];
-if ~exist(in_path)
+if ~exist(in_path,"file")
     mkdir(in_path);
 end
 %this is taking care of the case of more than 99 positions
 
 
-if ismember(2,todo);
+if ismember(2,todo)
+    %Getting position names
     %case of roatated data
     if do.rot==1
         %Special case if more than 100 pos
+         D=dir([in_path,'*p-001.tif']);
         if length(D)>99
             names={D.name};
-            f_pre=cellfun(@(a) findstr(a,'-'),names,'UniformOutput',false);
+            f_pre=cellfun(@(a) strfind(a,'-'),names,'UniformOutput',false);
             f=cell2mat(cellfun(@(a) a(2)-1,f_pre,'UniformOutput',false));
         else
             f=ones(length(D),1)*11;
         end
-        %checking if doing parallel segmentation
-        if do.para_seg==1
-            parfor i=pos_do_now
-                p = initschnitz(D(i).name(1:f(i)),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
-                p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
-            end
-        else
-            for i=pos_do_now
-                p = initschnitz(D(i).name(1:f(i)),date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
-                p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
-            end
+        pos_names_cell={D.name};
+        pos_names=cell(length(D),1);
+        for i=1:length(pos_names_cell)
+            pos_names{i}=pos_names_cell{i}(1:f(i));
         end
     else
-    %Case of non rotated data
-    %Special case if more than 100 pos
-        
+        D=dir([in_path(1:end-8),'*w1*_t1.tif']);
         names={D.name};
-        f_pre=cellfun(@(a) findstr(a,'_'),names,'UniformOutput',false);
-        f=cell2mat(cellfun(@(a) a(2)-1,f_pre,'UniformOutput',false));
-        movie_base=names{i}(1:f_pre{i}(1)-1);
-        
-        if do.para_seg==1
-            parfor i=pos_do_now
-                p = initschnitz([movie_base,'-',names{i}(f_pre{i}(2)+2:f_pre{i}(3)-1)],date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
-                p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
-            end
-        else
-            for i=pos_do_now
-                p = initschnitz([movie_base,'-',names{i}(f_pre{i}(2)+2:f_pre{i}(3)-1)],date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
-                p.do=do;
+        f_pre=cellfun(@(a) strfind(a,'_'),names,'UniformOutput',false);
+        f=cell2mat(cellfun(@(a) a(2)-1,f_pre,'UniformOutput',false)); 
+        movie_base_file=names{i}(1:f_pre{i}(1)-1);
+        matches=regexp(movie_base_file,'\d*','Match');
+        if ~isempty(matches)
+            fm=strfind(movie_base_file,matches{1});
+            movie_base=movie_base_file(1:fm-1);
+        end
+        pos_names=cell(length(D),1);
+        for i=1:length(D)
+            pos_names{i}=[movie_base,'-',str3(str2double(names{i}(f_pre{i}(2)+2:f_pre{i}(3)-1)))];
+        end
+        pos_names=sort(pos_names);
+    end
+    
+    %checking if doing parallel segmentation
+    if do.para_seg==1
+        parfor i=pos_do_now
+            p = initschnitz(pos_names{i},date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+            %p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
+            p.do=do;
+            if do.rot==0
                 p.imageDir=p.imageDir(1:end-8);
-                p = segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,'segRange',do.frames);
+                p.movieBaseFile=movieBaseFile;
             end
+            segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,'segRange',do.frames);
+        end
+    else
+        for i=pos_do_now
+            p = initschnitz(pos_names{i},date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+            %p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
+            p.do=do;
+            if do.rot==0
+                p.imageDir=p.imageDir(1:end-8);
+                p.movieBaseFile=movieBaseFile;
+            end
+            segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,'segRange',do.frames);
         end
     end
+%     else
+%     %Case of non rotated data
+%     %Special case if more than 100 pos
+%         D=dir([in_path,'*w1*_t1.tif']);
+%         names={D.name};
+%         f_pre=cellfun(@(a) findstr(a,'_'),names,'UniformOutput',false);
+%         f=cell2mat(cellfun(@(a) a(2)-1,f_pre,'UniformOutput',false));
+%         movie_base=names{i}(1:f_pre{i}(1)-1);
+%         
+%         if do.para_seg==1
+%             parfor i=pos_do_now
+%                 p = initschnitz([movie_base,'-',names{i}(f_pre{i}(2)+2:f_pre{i}(3)-1)],date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+%                 p.do=do;
+%                 p.imageDir=p.imageDir(1:end-8);
+%                 p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
+%             end
+%         else
+%             for i=pos_do_now
+%                 p = initschnitz([movie_base,'-',str3(str2num(names{i}(f_pre{i}(2)+2:f_pre{i}(3)-1)))],date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+%                 p.do=do;
+%                 p.imageDir=p.imageDir(1:end-8);
+%                 p = segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,'segRange',do.frames);
+%             end
+%         end
+%     end
         
 end
 

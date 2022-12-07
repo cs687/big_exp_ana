@@ -23,9 +23,9 @@ for i=frames_do_now
     else
         mynum = num2str(i);
         f=strfind(p.movieName,'-');
-        base_name=[p.movieName(1:f(1)-1),'_'];
-        pos_name='_s',p.movieName(f(1)+1:end)],
-        Dframe = dir([p.imageDir,base_name,p.do.rfp_name,'_t',mynum,'.tif']);
+        base_name=([p.movieName(1:f(1)-1),'_']);
+        pos_name=['_s',num2str(str2double(p.movieName(f(1)+1:end))),'_t',mynum,'.tif'];
+        Dframe = dir([p.imageDir,base_name,p.do.rfp_name,pos_name]);
         pname = Dframe(1).name;
     end
     %reading rfp image into memory
@@ -46,7 +46,8 @@ for i=frames_do_now
     %Setting correction to 1.
     tempsegcorrect=1;
     LNsub=Lc;
-    savelist=['''phsub'',''LNsub'',''Lc'',''tempsegcorrect'',''rect'',''timestamp'',''phaseFullSize'''];
+    %savelist=['''phsub'',''LNsub'',''Lc'',''tempsegcorrect'',''rect'',''timestamp'',''phaseFullSize'''];
+    savelist=['''preg'',''Lc'',''tempsegcorrect'',''rect'',''timestamp'',''phaseFullSize'''];
     % nitzan 2005June25 added the following to save both phases if different:
     if p.segmentationPhaseSlice~=p.prettyPhaseSlice
         phseg = phsub(:,:,p.segmentationPhaseSlice);
@@ -56,17 +57,17 @@ for i=frames_do_now
     %Loading and resizing fluorecent images
     Lname= [outprefix,mynum];
     if p.do.rot==1
+        Lname= [outprefix,mynum];
         cname= [p.imageDir,p.movieName,'-c-',mynum,'.tif'];
         yname= [p.imageDir,p.movieName,'-y-',mynum,'.tif'];
         gname= [p.imageDir,p.movieName,'-g-',mynum,'.tif'];
         rname= [p.imageDir,p.movieName,'-t-',mynum,'.tif'];
     else
-        f=strfind(p.movieName,'-');
-        [p.imageDir,p.movieName(1:f(1)-1),'_',p.do.rfp_name,'_s',p.movieName(f(1)+1:end),'_t',mynum,'.tif']
-        cname= [p.imageDir,p.movieName,'-c-',mynum,'.tif'];
-        yname= [p.imageDir,p.movieName,'-y-',mynum,'.tif'];
-        gname= [p.imageDir,p.movieName,'-g-',mynum,'.tif'];
-        rname= [p.imageDir,p.movieName,'-t-',mynum,'.tif'];
+        Lname= [outprefix,str3(i)];
+        cname=[p.imageDir,base_name,p.do.cfp_name,pos_name];
+        yname=[p.imageDir,base_name,p.do.yfp_name,pos_name];
+        gname=[p.imageDir,base_name,p.do.gfp_name,pos_name];
+        rname=[p.imageDir,base_name,p.do.rfp_name,pos_name];
     end
     %CFP
     if exist(cname)==2
