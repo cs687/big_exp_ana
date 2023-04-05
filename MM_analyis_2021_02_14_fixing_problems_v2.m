@@ -41,12 +41,15 @@ tic;
 do.rot=nan;
 todo=nan;
 seg=nan;
+do.chip=nan;
 do_plot=nan;
 correct_shift=nan;
 do.pos=nan;
 do.frames=nan;
 do.para_seg=nan;
 do.para_shift=nan;
+do.shift=nan;
+do.shift_show=nan;
 if ~isempty(varargin)
     for i = 1:2:length(varargin)
         theparam = lower(varargin{i});
@@ -67,8 +70,19 @@ if ~isempty(varargin)
                 do.para_seg=varargin{i+1};
             case 'do_para_shift'
                 do.para_shift=varargin{i+1}; 
+            case 'do_shift'
+                do.shift=varargin{i+1}; 
+            case 'do_shift_show'
+                do.shift_show=varargin{i+1}; 
             case 'rot'
                 do.rot=varargin{i+1}; 
+            case 'chip'
+                switch(strtok(lower(varargin{i+1})))
+                    case 'mm15'
+                        do.chip=0;
+                    case 'jin'
+                        do.chip=1;
+                end
         end
     end
 end
@@ -103,12 +117,26 @@ if isnan(do.para_seg)
     do.para_seg=1;
 end
 if isnan(do.para_shift)
-    do.para_shift=1;
+    do.para_shift=0;
+end
+if isnan(do.shift)
+    do.shift=1;
+end
+if isnan(do.shift_show);
+    do.shift_show=0;
+end
+if isnan(do.chip);
+    do.shift_show=0;
+end
+if isnan(do.chip);
+    do.chip=1;
 end
 
 if in_path(end)~='\'
     in_path=[in_path,'\'];
 end
+
+
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % 0. Set parameters
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -162,89 +190,40 @@ end
 
 if ismember(2,todo)
     %Getting position names
-    %case of roatated data
-    if do.rot==1
-        %Special case if more than 100 pos
-         D=dir([in_path,'*p-001.tif']);
-        if length(D)>99
-            names={D.name};
-            f_pre=cellfun(@(a) strfind(a,'-'),names,'UniformOutput',false);
-            f=cell2mat(cellfun(@(a) a(2)-1,f_pre,'UniformOutput',false));
-        else
-            f=ones(length(D),1)*11;
-        end
-        pos_names_cell={D.name};
-        pos_names=cell(length(D),1);
-        for i=1:length(pos_names_cell)
-            pos_names{i}=pos_names_cell{i}(1:f(i));
-        end
-    else
-        D=dir([in_path(1:end-8),'*w1*_t1.tif']);
-        names={D.name};
-        f_pre=cellfun(@(a) strfind(a,'_'),names,'UniformOutput',false);
-        f=cell2mat(cellfun(@(a) a(2)-1,f_pre,'UniformOutput',false)); 
-                movie_base=names{i}(1:f_pre{i}(1)-1);
-%         matches=regexp(movie_base_file,'\d*','Match');
-%         if ~isempty(matches)
-%             fm=strfind(movie_base_file,matches{1});
-%             movie_base=movie_base_file(1:fm-1);
-%         end
-        pos_names=cell(length(D),1);
-        for i=1:length(D)
-            pos_names{i}=[movie_base,'-',str3(str2double(names{i}(f_pre{i}(2)+2:f_pre{i}(3)-1)))];
-        end
-        pos_names=sort(pos_names);
-    end
+    %Its a case of roatated data
+    [pos_names,pos_names_data]=getting_pos_names_for_seg(in_path,do);
     
     %checking if doing parallel segmentation
-    if do.para_seg==1
+    if do.para_seg==1 %Case of parallel segementation
         parfor i=pos_do_now
             p = initschnitz(pos_names{i},date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+            p.movieName_file=p.movieName;
+            p.movieName=pos_names_data{i};
+            p.imageDir=p.imageDir(1:end-8);
             %p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
             p.do=do;
             if do.rot==0
                 p.imageDir=p.imageDir(1:end-8);
  %               p.movieBaseFile=movieBaseFile;
             end
-            segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,'segRange',do.frames);
+            segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,do,'segRange',do.frames);
         end
-    else
+    else %case of normal for loop
         for i=pos_do_now
             p = initschnitz(pos_names{i},date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+            p.movieName_file=p.movieName;
+            p.movieName=pos_names_data{i};
             %p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
+            p.imageDir=p.imageDir(1:end-8);
             p.do=do;
             if do.rot==0
                 p.imageDir=p.imageDir(1:end-8);
 %                p.movieBaseFile=movieBaseFile;
             end
-            segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,'segRange',do.frames);
+            segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,do,'segRange',do.frames);
         end
     end
-%     else
-%     %Case of non rotated data
-%     %Special case if more than 100 pos
-%         D=dir([in_path,'*w1*_t1.tif']);
-%         names={D.name};
-%         f_pre=cellfun(@(a) findstr(a,'_'),names,'UniformOutput',false);
-%         f=cell2mat(cellfun(@(a) a(2)-1,f_pre,'UniformOutput',false));
-%         movie_base=names{i}(1:f_pre{i}(1)-1);
-%         
-%         if do.para_seg==1
-%             parfor i=pos_do_now
-%                 p = initschnitz([movie_base,'-',names{i}(f_pre{i}(2)+2:f_pre{i}(3)-1)],date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
-%                 p.do=do;
-%                 p.imageDir=p.imageDir(1:end-8);
-%                 p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
-%             end
-%         else
-%             for i=pos_do_now
-%                 p = initschnitz([movie_base,'-',str3(str2num(names{i}(f_pre{i}(2)+2:f_pre{i}(3)-1)))],date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
-%                 p.do=do;
-%                 p.imageDir=p.imageDir(1:end-8);
-%                 p = segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,'segRange',do.frames);
-%             end
-%         end
-%     end
+
         
 end
 
@@ -260,9 +239,9 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 what_plot='AYlen';
 % if exist([p.rootDir,'2021-11-03'])
-%    p = initschnitz('Bacillus-01',date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+    p = initschnitz('Bacillus-01',date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
 % else
-     p = initschnitz('Bacillus-01',date_out,'bacillus','rootDir',in_path,'imageDir',in_path);
+%     p = initschnitz('Bacillus-01',date_out,'bacillus','rootDir',in_path,'imageDir',in_path);
 % end
 
 p.dataDir=[p.rootDir,'Data\'];
@@ -281,13 +260,13 @@ if ismember(3,todo);
     end   
 end
 
-if do_plot==1&&~ismember(3,todo);
+if do_plot==1&&ismember(4,todo);
     %Plotting AYlen
     what_plot='AYlen';
     plotting_MM_data_2021_11_01_v3(p,what_plot)
 %    plotting_MM_data_2021_11_05_v3_all(p,what_plot)
 %     saveas(gcf,[p.dataDir,in_path(end-10:end-1),'_',what_plot,'.pdf']);
-saveas(gcf,[p.dataDir,what_plot,'.pdf']);
+    saveas(gcf,[p.dataDir,what_plot,'.pdf']);
     %plotting MY
     what_plot='MY';
     plotting_MM_data_2021_11_01_v3(p,what_plot)
@@ -297,3 +276,54 @@ saveas(gcf,[p.dataDir,what_plot,'.pdf']);
 end
 
 toc;
+end
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Functions
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+function [pos_names_file,pos_names]=getting_pos_names_for_seg(in_path,do)
+% This function gets the positions names. 
+% Its a special case if rotation is needed.
+% Input: 
+% in_path: string e.g. '\\slcu.cam.ac.uk\data\Microscopy\TeamJL'
+% p: path structer as definded with initschnitz
+% do: structe with informatoin what to do
+
+
+if do.rot==1
+    %Special case if more than 100 pos
+    D=dir([in_path,'*p-001.tif']);
+    if length(D)>99
+        names={D.name};
+        f_pre=cellfun(@(a) strfind(a,'-'),names,'UniformOutput',false);
+        f=cell2mat(cellfun(@(a) a(2)-1,f_pre,'UniformOutput',false));
+    else
+        f=ones(length(D),1)*11;
+    end
+    pos_names_cell={D.name};
+    pos_names=cell(length(D),1);
+    for i=1:length(pos_names_cell)
+        pos_names{i}=pos_names_cell{i}(1:f(i));
+    end
+else
+    D=dir([in_path(1:end-8),'*w1*_t1.tif']);
+    names={D.name};
+    f_pre=cellfun(@(a) strfind(a,'_'),names,'UniformOutput',false);
+    f=cell2mat(cellfun(@(a) a(2)-1,f_pre,'UniformOutput',false)); 
+    movie_base=names{1}(1:f_pre{1}(1)-1);
+    %Removing number from basename
+    matches=regexp(movie_base,'\d*','Match');
+    if ~isempty(matches)
+        fm=strfind(movie_base,matches{1});
+        movie_base_file=movie_base(1:fm-1);
+    end
+    pos_names=cell(length(D),1);
+    pos_names_file=cell(length(D),1);
+    for i=1:length(D)
+        pos_names{i}=[movie_base,'-',str3(str2double(names{i}(f_pre{i}(2)+2:f_pre{i}(3)-1)))];
+        pos_names_file{i}=[movie_base_file,'-',str3(str2double(names{i}(f_pre{i}(2)+2:f_pre{i}(3)-1)))];
+    end
+    pos_names=sort(pos_names);
+    pos_names_file=sort(pos_names_file);
+end
+end

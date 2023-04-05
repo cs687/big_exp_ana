@@ -1,10 +1,11 @@
-function p = segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,varargin)
+function p = segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,do,varargin)
 % SEGMOVIEPHASE   Segment movie from phase images.
-%
+%  
 %   SEGMOVIEPHASE(P,do) segments the movie from phase images according to the
 %   parameters and controls described in the schnitzcells parameter
 %   structure P,and the analysis parameters do.
-%   typically generated using INITSCHNITZ.
+%   typically generated using INITSCHNITZ. 
+%   do: structure with information on how to segement
 %
 %   SEGMOVIEPHASE(P,'Field1',Value1,'Field2',Value2,...) segments the movie
 %   from phase images according to the parameters and controls described in the
@@ -46,7 +47,7 @@ function p = segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,varargin)
 
 numRequiredArgs = 1;
 if (nargin < 1) | ...
-        (mod(nargin,2) == 0) | ...
+        (mod(nargin,2) == 1) | ...
         (~isSchnitzParamStruct(p))
     errorMessage = sprintf ('%s\n%s\n%s\n',...
         'Error using ==> segmoviephase:',...
@@ -211,7 +212,7 @@ if isnan(p.segRange)
         p.segRange = str2num(imageNameStrings(:,numpos:numpos+2))';
     else
         f=strfind(p.movieName,'-');
-        mnamePhaseAll = [p.movieName(1:f(1)-1),'_',p.do.rfp_name,'_s',p.movieName(f(1)+1:end),'_t*.tif'];
+        mnamePhaseAll = [p.movieName(1:f(1)-1),'_',p.do.rfp_name,'_s',num2str(str2num(p.movieName(f(1)+1:end))),'_t*.tif'];
         %D= dir([p.imageDir(1:end-8), mnamePhaseAll]);
         D= dir([p.imageDir, mnamePhaseAll]);
         p.segRange = 1:length(D);
@@ -227,7 +228,7 @@ else
 end
 % set some defaults if they don't exist
 if exist('outprefix')~=1
-    outprefix = [p.movieName 'seg'];
+    outprefix = [p.movieName_file 'seg'];
 end
 if ~isfield(p,'prettyPhaseSlice');
     if p.numphaseslices>1
@@ -324,4 +325,4 @@ regsize= 0;% max translation (pixels) between phase and fl. images - obsolete.
 % 
 
 %Core Segmentation
-segpara_no_renaming_2022_12_05_v1(p,outprefix,regsize,SAVESEG,p.segRange);
+segpara_no_renaming_2022_12_05_v1(p,outprefix,regsize,SAVESEG,p.segRange,do);

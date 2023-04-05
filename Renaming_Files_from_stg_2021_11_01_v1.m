@@ -48,7 +48,7 @@ posname=posname(keep_ind);
 % Removing number from name
 clear pname;
 num_ind=cellfun(@(a) strfind(a,'_'),posname,'UniformOutput',false);
-for i=1:length(posname)
+for i=1:length(posname)-1
     pname{i}=posname{i}(2:num_ind{i}(end)-1);
 end
 pname=pname';
