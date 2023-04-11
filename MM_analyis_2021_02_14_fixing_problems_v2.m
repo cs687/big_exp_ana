@@ -195,7 +195,9 @@ if ismember(2,todo)
     
     %checking if doing parallel segmentation
     if do.para_seg==1 %Case of parallel segementation
-        parfor i=pos_do_now
+        ind_pos_do_now=1:length(pos_do_now);
+        parfor ii=ind_pos_do_now
+            i=pos_do_now(ii);
             p = initschnitz(pos_names{i},date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
             p.movieName_file=p.movieName;
             p.movieName=pos_names_data{i};
@@ -209,7 +211,8 @@ if ismember(2,todo)
             segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,do,'segRange',do.frames);
         end
     else %case of normal for loop
-        for i=pos_do_now
+        
+        for i=pos_do_now 
             p = initschnitz(pos_names{i},date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
             p.movieName_file=p.movieName;
             p.movieName=pos_names_data{i};
