@@ -211,19 +211,41 @@ if ismember(2,todo)
             segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,do,'segRange',do.frames);
         end
     else %case of normal for loop
-        
-        for i=pos_do_now 
-            p = initschnitz(pos_names{i},date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
-            p.movieName_file=p.movieName;
-            p.movieName=pos_names_data{i};
-            %p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
-            p.imageDir=p.imageDir(1:end-8);
-            p.do=do;
-            if do.rot==0
-                p.imageDir=p.imageDir(1:end-8);
-%                p.movieBaseFile=movieBaseFile;
+        while length(pos_do_now)~=0
+            try
+                for i=pos_do_now 
+                    p = initschnitz(pos_names{i},date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+                    p.movieName_file=p.movieName;
+                    p.movieName=pos_names_data{i};
+                    %p = segmoviefluor_mm_para_2021_05_25_v2(p,'do_pos',do.pos,'do_frames',do.frames);
+                    p.imageDir=p.imageDir(1:end-8);
+                    p.do=do;
+                    if do.rot==0
+                        p.imageDir=p.imageDir(1:end-8);
+        %                p.movieBaseFile=movieBaseFile;
+                    end
+                    segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,do,'segRange',do.frames);
+                end
+            catch
+                D=dir([in_path,'\subAuto\2022-03-23\B*']);
+                names={D.name};
+                names2=cellfun(@(a) str2num(a(end-2:end)),names,'UniformOutput',false);
+                names3=cell2mat(names2);
+                w=1; 
+                clear good;
+                for i=1:length(1:141)
+                    if sum(names3==i)==0
+                        good(w)=i; 
+                        w=w+1;
+                    end
+                end
+                pos_do_now=good;
+                if length(pos_do_now)>0
+                    [~,ind]=sort({D.date});
+                    ns=names(ind);
+                    delete([in_path,'\subAuto\2022-03-23\',ns{end}]);
+                end
             end
-            segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,do,'segRange',do.frames);
         end
     end
 
