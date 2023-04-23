@@ -10,6 +10,7 @@ function make_sfiles_mothercell_2022_02_11_v_bug_fixing_para(p,varargin)
 % datedir= 'C:\Users\Chris\Desktop\test_mm\2\2\subAuto\2016-06-14';
 %getting varagin
 %good_pos=0;
+
 do.frames=nan;
 do.pos=nan;
 
@@ -26,7 +27,14 @@ if ~isempty(varargin)
     end
 end
                
-    
+if do.chip==1
+    do.buffer=100;
+    do.buffer_crop=100;
+else
+    do.buffer=20;
+    do.buffer_crop=20;
+end
+
 imgdir = p.imageDir; % no slash at end, input the 'sub' folder
 %datedir= p.dateDir;
 date1=p.movieDate;
@@ -155,15 +163,17 @@ for posctr = do_pos_now;
             end
         end
         %Better channel cropping
+         %imshow(Lc); 
         edge_line=sum(Lc_m(:,:,1),2);
         edge_cand=edge_line>max(edge_line)/2;
         f=find(edge_cand);
-        if f(1)+200<size(Lc_m,1);
-            [channels,~]=peakfinder_2016(mean(mean(Lc_m(1:f(1)+200,:,:),3)),0.3);
+        Lc1=logical(Lc_m(:,:,1));
+        if f(1)+200<size(Lc_m,1)
+            [~,channels]=findpeaks(mean(Lc1(1:f(1)+200,:,1)),'MinPeakDistance',do.buffer);
         else
-            [channels,~]=peakfinder_2016(mean(mean(Lc_m(end-200:end,:,:),3)),0.3);
+            [~,channels]=findpeaks(mean(Lc1(end-200:end,:,1)),'MinPeakDistance',do.buffer);
         end
-        good_channels=channels>21&channels<2048-20;
+        good_channels=channels>do.buffer_crop+1&channels<size(Lc1,2)-do.buffer_crop;
         channels=channels(good_channels);
         
 %         %channels=dlmread([imgdir,'channel_pos_',poslist{posctr}(10:11),'.txt']);
@@ -182,9 +192,9 @@ for posctr = do_pos_now;
             %for c=1:3
 
                 disp(c);
-                Lc_c=Lc_m(:,channels(c)-20:channels(c)+20,:);
-                yreg_c=yreg_m(:,channels(c)-20:channels(c)+20,:);
-                rreg_c=rreg_m(:,channels(c)-20:channels(c)+20,:);
+                Lc_c=Lc_m(:,channels(c)-do.buffer_crop:channels(c)+do.buffer_crop,:);
+                yreg_c=yreg_m(:,channels(c)-do.buffer_crop:channels(c)+do.buffer_crop,:);
+                rreg_c=rreg_m(:,channels(c)-do.buffer_crop:channels(c)+do.buffer_crop,:);
                 %declare the s structure
                 s = struct('frames',[],'P',[],'D',[],'E',[],'len',[],'wid',[],'MC',[],'MY',[],'MR',[],'cellno',[],'channel_pos',[]);
                 sch_num = 1; sch_age = 0;
