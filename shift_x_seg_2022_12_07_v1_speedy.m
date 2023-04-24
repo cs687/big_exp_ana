@@ -29,6 +29,7 @@ if i==1
     Lc_out(:,buffer_x:buffer_x+size_x-1)=indata.Lc;
     yreg_out(:,buffer_x:buffer_x+size_x-1)=indata.yreg;
     rreg_out(:,buffer_x:buffer_x+size_x-1)=indata.rreg;
+    preg_out(:,buffer_x:buffer_x+size_x-1)=indata.preg;
 %all other cases
 else
     %looping over all channels in first image (f(end)-1)

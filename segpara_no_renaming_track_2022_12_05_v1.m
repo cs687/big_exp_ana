@@ -111,10 +111,10 @@ for i=frames_do_now
     %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
     %shifting images if needed
     if do.shift==1
-        [out2]=shift_data(i,out,do);
+        [out]=shift_data(i,out,do);
         if do.shift_show==1
             figure;
-            imshow(out2.Lc);
+            imshow(out.Lc);
             c_to_plot=out2.channels;
             c_to_plot(c_to_plot==0)=nan;
             vline(c_to_plot(:,i)+150,'r');
@@ -148,6 +148,7 @@ for i=frames_do_now
 %         disp(['saved file ',p.segmentationDir,Lname]);
 %     end
     if do.seg_trac==1
+        track_all_cells_with_seg(p,out)
     end
 
 end

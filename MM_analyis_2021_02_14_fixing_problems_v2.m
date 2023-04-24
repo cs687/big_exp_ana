@@ -50,6 +50,7 @@ do.para_seg=nan;
 do.para_shift=nan;
 do.shift=nan;
 do.shift_show=nan;
+do.seg_trac=nan;
 if ~isempty(varargin)
     for i = 1:2:length(varargin)
         theparam = lower(varargin{i});
@@ -74,6 +75,8 @@ if ~isempty(varargin)
                 do.shift=varargin{i+1}; 
             case 'do_shift_show'
                 do.shift_show=varargin{i+1}; 
+            case 'do_seg_trac'
+                do.seg_trac=varargin{i+1}; 
             case 'rot'
                 do.rot=varargin{i+1}; 
             case 'chip'
@@ -134,6 +137,10 @@ end
 
 if in_path(end)~='\'
     in_path=[in_path,'\'];
+end
+
+if isnan(do.seg_trac);
+    do.seg_trac=0;
 end
 
 
@@ -224,8 +231,11 @@ if ismember(2,todo)
                         p.imageDir=p.imageDir(1:end-8);
         %                p.movieBaseFile=movieBaseFile;
                     end
-                    segmoviefluor_mm_para_no_renaming_one_track_2023_04_24_v1(p,do,'segRange',do.frames);
-                    %segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,do,'segRange',do.frames);
+                    if do_seg_track==1
+                        segmoviefluor_mm_para_no_renaming_one_track_2023_04_24_v1(p,do,'segRange',do.frames);
+                    else
+                        segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,do,'segRange',do.frames);
+                    end
                 end
             catch
                 D=dir([in_path,'\subAuto\2022-03-23\B*']);
