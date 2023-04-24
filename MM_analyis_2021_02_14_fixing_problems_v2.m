@@ -224,7 +224,8 @@ if ismember(2,todo)
                         p.imageDir=p.imageDir(1:end-8);
         %                p.movieBaseFile=movieBaseFile;
                     end
-                    segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,do,'segRange',do.frames);
+                    segmoviefluor_mm_para_no_renaming_one_track_2023_04_24_v1(p,do,'segRange',do.frames);
+                    %segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,do,'segRange',do.frames);
                 end
             catch
                 D=dir([in_path,'\subAuto\2022-03-23\B*']);
