@@ -51,6 +51,7 @@ do.para_shift=nan;
 do.shift=nan;
 do.shift_show=nan;
 do.seg_trac=nan;
+do.seg_track=nan;
 if ~isempty(varargin)
     for i = 1:2:length(varargin)
         theparam = lower(varargin{i});
@@ -75,8 +76,8 @@ if ~isempty(varargin)
                 do.shift=varargin{i+1}; 
             case 'do_shift_show'
                 do.shift_show=varargin{i+1}; 
-            case 'do_seg_trac'
-                do.seg_trac=varargin{i+1}; 
+            case 'do_seg_track'
+                do.seg_track=varargin{i+1}; 
             case 'rot'
                 do.rot=varargin{i+1}; 
             case 'chip'
@@ -139,8 +140,8 @@ if in_path(end)~='\'
     in_path=[in_path,'\'];
 end
 
-if isnan(do.seg_trac);
-    do.seg_trac=0;
+if isnan(do.seg_track);
+    do.seg_track=1;
 end
 
 
@@ -218,8 +219,8 @@ if ismember(2,todo)
             segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,do,'segRange',do.frames);
         end
     else %case of normal for loop
-        while length(pos_do_now)~=0
-            try
+%         while length(pos_do_now)~=0
+%            % try
                 for i=pos_do_now 
                     p = initschnitz(pos_names{i},date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
                     p.movieName_file=p.movieName;
@@ -231,33 +232,34 @@ if ismember(2,todo)
                         p.imageDir=p.imageDir(1:end-8);
         %                p.movieBaseFile=movieBaseFile;
                     end
-                    if do_seg_track==1
+                    if do.seg_track==1
                         segmoviefluor_mm_para_no_renaming_one_track_2023_04_24_v1(p,do,'segRange',do.frames);
                     else
                         segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,do,'segRange',do.frames);
                     end
+%                 end
+%             catch
+%                 D=dir([in_path,'\subAuto\2022-03-23\B*']);
+%                 names={D.name};
+%                 names2=cellfun(@(a) str2num(a(end-2:end)),names,'UniformOutput',false);
+%                 names3=cell2mat(names2);
+%                 w=1; 
+%                 clear good;
+%                 for i=1:length(1:141)
+%                     if sum(names3==i)==0
+%                         good(w)=i; 
+%                         w=w+1;
+%                     end
+%                 end
+%                 pos_do_now=good;
+%                 if length(pos_do_now)>0
+%                     [~,ind]=sort({D.date});
+%                     ns=names(ind);
+%                     delete([in_path,'\subAuto\2022-03-23\',ns{end}]);
+%                 end
+%             end
                 end
-            catch
-                D=dir([in_path,'\subAuto\2022-03-23\B*']);
-                names={D.name};
-                names2=cellfun(@(a) str2num(a(end-2:end)),names,'UniformOutput',false);
-                names3=cell2mat(names2);
-                w=1; 
-                clear good;
-                for i=1:length(1:141)
-                    if sum(names3==i)==0
-                        good(w)=i; 
-                        w=w+1;
-                    end
-                end
-                pos_do_now=good;
-                if length(pos_do_now)>0
-                    [~,ind]=sort({D.date});
-                    ns=names(ind);
-                    delete([in_path,'\subAuto\2022-03-23\',ns{end}]);
-                end
-            end
-        end
+                saving_all_tracking_data(p,pos_do_now);
     end
 
         
@@ -275,7 +277,7 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 what_plot='AYlen';
 % if exist([p.rootDir,'2021-11-03'])
-    p = initschnitz('Bacillus-01',date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+    p = initschnitz('Bacillus-001',date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
 % else
 %     p = initschnitz('Bacillus-01',date_out,'bacillus','rootDir',in_path,'imageDir',in_path);
 % end

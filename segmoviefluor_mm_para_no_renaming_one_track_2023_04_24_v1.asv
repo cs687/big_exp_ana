@@ -325,4 +325,4 @@ regsize= 0;% max translation (pixels) between phase and fl. images - obsolete.
 % 
 
 %Core Segmentation
-segpara_no_renaming_one_track_2022_12_05_v1(p,outprefix,regsize,SAVESEG,p.segRange,do);
+segpara_no_renaming_2022_12_05_v1(p,outprefix,regsize,SAVESEG,p.segRange,do);
