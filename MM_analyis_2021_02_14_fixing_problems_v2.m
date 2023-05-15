@@ -176,6 +176,10 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %finding number of posiutions
 % D=dir([in_path,'*p-001.tif']);
+D=dir([in_path,'\*_thumb_*']);
+if ~isempty(D)
+    delete([in_path,'\*_thumb_*']);
+end
 if isnan(do.pos)
     if ismember(1,todo)&&do.rot==1
         D=dir([in_path,'subAuto\*p-001.tif']);
@@ -216,8 +220,21 @@ if ismember(2,todo)
                 p.imageDir=p.imageDir(1:end-8);
  %               p.movieBaseFile=movieBaseFile;
             end
-            segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,do,'segRange',do.frames);
+            if do.seg_track==1
+                D_done=dir([p.tracksDir,'B*']);
+                if isempty(D_done);
+                    try
+                    segmoviefluor_mm_para_no_renaming_one_track_2023_04_24_v1(p,do,'segRange',do.frames);
+                    end
+                end
+            else
+                segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,do,'segRange',do.frames);
+            end
         end
+    i=1;
+    p = initschnitz(pos_names{i},date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
+    p.dataDir=[p.rootDir,'Data\'];
+    saving_all_tracking_data(p,pos_do_now);
     else %case of normal for loop
 %         while length(pos_do_now)~=0
 %            % try
@@ -233,7 +250,10 @@ if ismember(2,todo)
         %                p.movieBaseFile=movieBaseFile;
                     end
                     if do.seg_track==1
-                        segmoviefluor_mm_para_no_renaming_one_track_2023_04_24_v1(p,do,'segRange',do.frames);
+                        D_done=dir([p.tracksDir,'B*']);
+                        if isempty(D_done);
+                            segmoviefluor_mm_para_no_renaming_one_track_2023_04_24_v1(p,do,'segRange',do.frames);
+                        end
                     else
                         segmoviefluor_mm_para__no_renaming_2021_05_25_v2(p,do,'segRange',do.frames);
                     end
