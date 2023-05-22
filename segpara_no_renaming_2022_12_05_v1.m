@@ -38,7 +38,7 @@ for i=frames_do_now
      X(:,:,1) = imread([p.imageDir,pname]);
 
     %actual segementation
-    [out.Lc,~,out.rect,s_end]= segfluor_Cs_2_faster_99(X, p);
+    [out.Lc,~,out.rect,s_end]= segfluor_Cs_2_faster_99(X, p,do);
 %     out.preg=phsub;
 %     out.Lc=Lc;
 %     out.rect;

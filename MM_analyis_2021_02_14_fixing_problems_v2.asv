@@ -52,7 +52,6 @@ do.shift=nan;
 do.shift_show=nan;
 do.seg_trac=nan;
 do.seg_track=nan;
-do.back=nan;
 if ~isempty(varargin)
     for i = 1:2:length(varargin)
         theparam = lower(varargin{i});
@@ -88,12 +87,10 @@ if ~isempty(varargin)
                     case 'jin'
                         do.chip=1;
                 end
-            case 'cube'
+            case 'scope'
                 switch(strtok(lower(varargin{i+1})))
-                    case 'bright'
+                    case 'bacillus2'
                         do.back=500;
-                    case 'dim'
-                        do.back=200;
                 end
         end
     end
@@ -150,10 +147,6 @@ end
 
 if isnan(do.seg_track);
     do.seg_track=1;
-end
-
-if isnan(do.back);
-    do.back=500;
 end
 
 

@@ -1,4 +1,4 @@
-function [L, phsub, rect, s_end]= segfluor_Cs_2_faster_99(ph3, p)
+function [L, phsub, rect, s_end]= segfluor_Cs_2_faster_99(ph3, p,do)
 % This is the core function which segments the images. Uses an edge detection
 % algorithm to segments the cells. 
 %   
@@ -25,9 +25,10 @@ end
 % Preparing RFP image to be segmented
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 % median filter and rescale phase images
+
 for i= 1:size(ph3,3)
     ph3(:,:,i)= medfilt2(ph3(:,:,i),[3 3]);
-    x= double(ph3(:,:,i)-500);
+    x= double(ph3(:,:,i)-do.back);
     x(x<0)=0;
     s= sort(x(:));
     small= s(25);
