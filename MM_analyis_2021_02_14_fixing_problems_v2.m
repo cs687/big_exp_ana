@@ -165,9 +165,12 @@ date_out='2022-04-52';
 % do.phase_name='w1Phase';
 % do.rfp_name='w2RFP - Camera';
 % do.yfp_name='w3YFP - Camera';
-do.phase_name='w1Phase';
-do.rfp_name='w2RFP';
-do.yfp_name='w3YFP';
+% do.phase_name='w1Phase';
+% do.rfp_name='w2RFP';
+% do.yfp_name='w3YFP';
+do.phase_name='w1Brightfield-TI2';
+do.rfp_name='w2RFP-TI2';
+do.yfp_name='w3YFP - TI2';
 do.cfp_name=nan;
 do.gfp_name=nan;
 

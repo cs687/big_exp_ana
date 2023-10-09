@@ -379,7 +379,9 @@ data_D=dir([imgdir,'Data\']);
 save([imgdir,'Data\','all_schnitz_',str2(length(data_D)),'m.mat'],all_s{:});
     catch
          disp(['Problem ']);
+         clear Lc_m yreg_m reg_m rreg_m Lc_c yreg_c creg_c rreg_c;
     end
+    
 end
 
 all_s=whos('s_Bacillus*');
