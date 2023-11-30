@@ -162,12 +162,12 @@ end
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 date_in='2022-03-23';
 date_out='2022-04-52';
-% do.phase_name='w1Phase';
-% do.rfp_name='w2RFP - Camera';
-% do.yfp_name='w3YFP - Camera';
 do.phase_name='w1Phase';
-do.rfp_name='w2RFP';
-do.yfp_name='w3YFP';
+do.rfp_name='w2RFP - Camera';
+do.yfp_name='w3YFP - Camera';
+% do.phase_name='w1Phase';
+% do.rfp_name='w2RFP';
+% do.yfp_name='w3YFP';
 do.cfp_name=nan;
 do.gfp_name=nan;
 
@@ -253,7 +253,8 @@ if ismember(2,todo)
     else %case of normal for loop
 %         while length(pos_do_now)~=0
 %            % try
-                for i=pos_do_now 
+                %for i=pos_do_now 
+                for i=12 
                     p = initschnitz(pos_names{i},date_in,'bacillus','rootDir',in_path,'imageDir',in_path);
                     p.movieName_file=p.movieName;
                     p.movieName=pos_names_data{i};

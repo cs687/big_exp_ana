@@ -49,7 +49,7 @@ colors='ry';
 % clear basenamedir basenamesetpoints;
 
 %D_pos=dir('*-p-001.tif');
-D_pos=dir([imgdir,date1,'\Bacillus-*']);
+D_pos=dir([imgdir,date1,'\Bacillus*']);
 poslist_pre = {D_pos.name};
 
 for i=1:length(poslist_pre)
